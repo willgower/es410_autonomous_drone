@@ -44,6 +44,7 @@ class DroneControl:
     def report(self, message):
         """
         method to directly report a message to GCS
+        James - is this even required for literally a direct function call? I'd say unnecessary.
         """
         self.gcs.send_message(message)
 
