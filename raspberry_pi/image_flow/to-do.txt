@@ -1,0 +1,5 @@
+To do list for Aaron
+Colour tracking
+Corner detection
+Testing of the programs with a webcam
+Implementation into Rpi
