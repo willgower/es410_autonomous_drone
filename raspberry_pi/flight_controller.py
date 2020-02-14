@@ -9,6 +9,7 @@ class FlightController:
     def __init__(self):
         """
         Initialise module wide variables and objects.
+        Start MAVLink connection to the Pixhawk
         """
 
     def set_destination(self, location):
