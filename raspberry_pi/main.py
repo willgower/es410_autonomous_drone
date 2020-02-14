@@ -3,10 +3,16 @@
 # File: main.py
 # Description: Module to be entry point and have overall control of companion computer operations
 
+# Custom module imports
 from flight_controller import FlightController
 from data_logging import DataLogging
 from ground_communication import GroundCommunication
 from landing_vision import LandingVision
+
+# Generic module imports
+from threading import Timer
+from gpiozero import LED
+from time import sleep
 
 
 class DroneControl:
@@ -15,16 +21,31 @@ class DroneControl:
         instantiate objects 
         this process will establish communication links
         """
+        # Instantiate custom modules
+        self.gcs = GroundCommunication()
+
+        if self.gcs.error:
+            self.alert_initialisation_failure()
+
+        self.fc = FlightController()
+        self.lv = LandingVision()
+        self.dl = DataLogging()
+
+        # Initialise some global variables
+        self.abortFlag = False
 
     def alert_initialisation_failure(self):
         """
-        in case communication to the ground control station (GCS) was not established, drone should have other means of reporting initialisation failure
+        in case communication to the ground control station (GCS)
+        was not established, drone should have other means of reporting initialisation failure
         """
+        # Flash some LEDs!
 
     def report(self, message):
         """
         method to directly report a message to GCS
         """
+        self.gcs.send_message(message)
 
     def abort(self):
         """
@@ -50,9 +71,11 @@ class DroneControl:
 
     def process_mission(self):
         """ 
-        when mission received from GCS passed to this fn
+        This function will sit and wait for a mission to be received from the GCS
         this function must process and set as the mission on the flight controller (FC)
+        If the mission requests data logging then it will also need to be triggered here.
         """
+
 
     def battery_load(self):
         """
