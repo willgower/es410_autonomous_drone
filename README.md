@@ -6,7 +6,7 @@ Repository to contain all of the code across 3 devices:
 Raspberry Pi
 - main.py
 - landing_vision.py
-- ground_control_station.py
+- ground_communication.py
 - flight_controller.py
 - micro_controller.py
 - data_logger.py
