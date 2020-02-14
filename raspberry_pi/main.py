@@ -3,7 +3,11 @@
 # File: main.py
 # Description: Module to be entry point and have overall control of companion computer operations
 
-# do imports
+from flight_controller import FlightController
+from data_logging import DataLogging
+from ground_communication import GroundCommunication
+from landing_vision import LandingVision
+
 
 class DroneControl:
     def __init__(self):
