@@ -4,3 +4,10 @@
 # Description: Module to process images and return high level movement commands
 
 # Return a tuple of form (x, y, yaw_angle)
+
+
+class LandingVision:
+    def __init__(self):
+        """
+        Initialise module (eg camara connection)
+        """
