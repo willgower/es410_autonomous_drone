@@ -1,5 +1,5 @@
 # ES410 Autonomous Drone
-# Author: James Bennett
+# Owner: James Bennett
 # File: main.py
 # Description: Module to be entry point and have overall control of companion computer operations
 
@@ -64,6 +64,38 @@ class Main:
 
     def monitor_flight(self):
         """
-
+        monitor drone status
+        facilitate logging
+        report to base
+        continue when loiter point reached
         """
 
+    def guide_to_target(self):
+        """
+        get drone state
+        pass to vision system to compute action
+        execute action by instructing FC
+        continue logging and reporting
+        when above location, land drone
+        """
+
+    def release_package(self):
+        """
+        open the grippers to release the package
+        """
+
+    def upload_return_mission(self):
+        """
+        mission to return to base
+        the mission will be executed using previously defined functions
+        """
+
+    def shutdown(self):
+        """
+        close communication ports and 
+        perform clean shutdown of electronics running from secondary battery
+        """
+
+
+
+if __name__=="__main__":
