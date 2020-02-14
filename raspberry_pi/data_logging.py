@@ -1,5 +1,5 @@
 # ES410 Autonomous Drone
-# Author: William Gower
+# Owner: William Gower
 # File: data_logging.py
 # Description: Module to handle the logging of in flight data such as current readings against time.
 
