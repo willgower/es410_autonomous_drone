@@ -15,7 +15,6 @@ class FlightController:
         Initialise module wide variables and objects.
         Start MAVLink connection to the Pixhawk
         Set flag for successful initialisation
-        /dev/serial/by-id/usb-ArduPilot_fmuv2_390030000E51373337333031
         """
         self.initSuccessful = False  # Assume connection fails
         try:
