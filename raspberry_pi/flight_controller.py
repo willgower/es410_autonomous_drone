@@ -4,6 +4,7 @@
 # Description: Module to handle MAVLink communication to the Pixhawk
 
 import dronekit
+from pymavlink import mavutil
 import socket
 import json
 
@@ -68,17 +69,19 @@ class FlightController:
 
         fc_data_encoded = json.JSONEncoder().encode(fc_data)
 
-        print(fc_data_encoded)
+        return fc_data_encoded
 
     def get_hwss_status(self):
         """
         Get the status of the hardware safety switch.
         """
+        return self.vehicle.
 
     def get_arm_status(self):
         """
         Return whether or not the drone is armable.
         """
+        return self.vehicle.is_armable
 
     def begin_flight(self):
         """
@@ -89,11 +92,26 @@ class FlightController:
         """
         Change between auto mission mode and guided 'joystick' mode.
         """
+        if flight_mode in ["AUTO", "GUIDED", "LOITER"]:
+            self.vehicle.mode = flight_mode
+        else:
+            print("Invalid flight mode sent")
 
-    def move_relative(self, x, y, altitude, yaw):
+    def move_relative(self, velocity_x, velocity_y, velocity_z, yaw):
         """
         Provide low level 'joystick style' commands to the drone.
         """
+        msg = self.vehicle.message_factory.set_position_target_local_ned_encode(
+            0,                                              # time_boot_ms (not used)
+            0, 0,                                           # target_system, target_component
+            mavutil.mavlink.MAV_FRAME_BODY_NED,   # frame
+            0b0000111111000111,                             # type_mask (only speeds enabled)
+            0, 0, 0,                                        # x, y, z positions
+            velocity_x, velocity_y, velocity_z,             # x, y, z velocity in m/s
+            0, 0, 0,                                        # x, y, z acceleration (not supported yet, ignored in GCS_Mavlink)
+            0, 0)                                           # yaw, yaw_rate (not supported yet, ignored in GCS_Mavlink)
+
+        self.vehicle.send_mavlink(msg)  # Send the command to the vehicle
 
 
 if __name__ == "__main__":
