@@ -120,6 +120,12 @@ class FlightController:
 
         self.vehicle.send_mavlink(msg)  # Send the command to the vehicle
 
+    def close(self):
+        """
+        prepare for system shutdown
+        stop processes, close communications and shutdown hardware where possible
+        """
+
 
 if __name__ == "__main__":
     fc = FlightController()

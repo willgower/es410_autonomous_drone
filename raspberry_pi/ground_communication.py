@@ -32,3 +32,9 @@ class GroundControlStation:
         Send the message back to the GCS
         """
 
+    def close(self):
+        """
+        prepare for system shutdown
+        stop processes, close communications and shutdown hardware where possible
+        """
+

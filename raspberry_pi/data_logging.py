@@ -49,6 +49,12 @@ class DataLogging:
         self.t.cancel()
         self.data_file.close()
 
+    def close(self):
+        """
+        prepare for system shutdown
+        Will - or does the above method do this?
+        """
+
 
 if __name__ == "__main__":
     data_logging = DataLogging()

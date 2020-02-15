@@ -36,3 +36,9 @@ class MicroController:
         """
         when called should return latest current reading
         """
+
+    def close(self):
+        """
+        prepare for system shutdown
+        stop processes, close communications and shutdown hardware where possible
+        """
