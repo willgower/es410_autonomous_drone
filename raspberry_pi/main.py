@@ -3,14 +3,50 @@
 # File: main.py
 # Description: Module to be entry point and have overall control of companion computer operations
 
-# do imports
+from raspberry_pi.flight_controller import FlightController
+from raspberry_pi.ground_communication import GroundControlStation
+from raspberry_pi.micro_controller import MicroController
+from raspberry_pi.data_logging import DataLogging
+from raspberry_pi.landing_vision import LandingVision
+
+import sys
 
 class DroneControl:
     def __init__(self):
         """
         instantiate objects 
         this process will establish communication links
+        if fail then raise an exception that will terminate the program
         """
+        
+        self.gcs = GroundControlStation()
+        if self.gcs.initSuccessful:
+            self.report("Link to GCS established")
+        else:
+            # if fail to open link to GCS no means of reporting so enter specific sequence
+            self.alert_initialisation_failure()
+            raise ValueError("Failed to communicate with Ground Control Station")
+
+        self.fc = FlightController()
+        if self.fc.initSuccessful:
+            self.report("Link to FC established")
+        else:
+            self.report("Link to FC failed")
+            raise ValueError("Failed to communicate with Flight Controller")
+
+        self.uC = MicroController()
+        if self.uC.initSuccessful:
+            self.report("Link to uC established")
+        else:
+            self.report("Link to uC failed")
+            raise ValueError("Failed to communicate with Micro Controller")
+
+        # no reason for these classes to fail to initialise
+        self.logger = DataLogging()
+        self.vision = LandingVision()
+        
+
+
 
     def alert_initialisation_failure(self):
         """
@@ -121,11 +157,16 @@ class DroneControl:
 
 
 if __name__=="__main__":
-    # initialise drone
-    drone = DroneControl()
-    # if successful will return drone object
-    # else ??????????
+    # === INITIALISATION ===
+    # try to initialise drone
+    # if fail then print error and exit program
+    try:
+        drone = DroneControl()
+    except ValueError as error:
+        print(error)
+        sys.exit()
 
+    # if exception raised in initialisation then this will not execute because sys.exit()
     while True:
         # === IDLE ===
         # state: idle
