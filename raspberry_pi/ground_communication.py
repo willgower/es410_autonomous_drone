@@ -9,22 +9,24 @@
 # =====================================
 
 class GroundControlStation:
+
     def __init__(self):
         """
-        open communication to ground station 
-        handle errors
-        Set flag for successful initialisation
+        Start wireless serial connection to the GCS using the NRF24L01 modules.
+        Timeout - 10s
         """
-
+        
         self.initSuccessful = True
+        
+        # Start serial connection here as soon as module is instantiated
 
-    def read_msg(self):
+    def read_message(self):
         """
-        read ground control station
-        return message as string
+        Read the latest message from the serial buffer and return it
         """
 
-    def send_msg(self, msg):
+    def send_message(self, message):
         """
-        send specified message to the GCS
+        Send the message back to the GCS
         """
+

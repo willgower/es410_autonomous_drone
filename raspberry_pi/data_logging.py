@@ -4,7 +4,6 @@
 # Description: Module to handle the logging of in flight data such as current readings against time.
 
 from threading import Timer
-import time
 from datetime import datetime
 import serial
 

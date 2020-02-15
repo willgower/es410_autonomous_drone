@@ -13,12 +13,12 @@ import sys
 
 class DroneControl:
     def __init__(self):
-        """
-        instantiate objects 
-        this process will establish communication links
-        if fail then raise an exception that will terminate the program
-        """
-        
+        #"""
+        #instantiate objects 
+        #this process will establish communication links
+        #if fail then raise an exception that will terminate the program
+        #"""
+
         self.gcs = GroundControlStation()
         if self.gcs.initSuccessful:
             self.report("Link to GCS established")
@@ -41,19 +41,19 @@ class DroneControl:
             self.report("Link to uC failed")
             raise ValueError("Failed to communicate with Micro Controller")
 
-        # no reason for these classes to fail to initialise
-        self.logger = DataLogging()
-        self.vision = LandingVision()
-
     def alert_initialisation_failure(self):
         """
-        in case communication to the ground control station (GCS) was not established, drone should have other means of reporting initialisation failure
+        in case communication to the ground control station (GCS)
+        was not established, drone should have other means of reporting initialisation failure
         """
+        # Flash some LEDs!
 
     def report(self, message):
         """
         method to directly report a message to GCS
+        James - is this even required for literally a direct function call? I'd say unnecessary.
         """
+        self.gcs.send_message(message)
 
     def abort(self):
         """
@@ -79,9 +79,11 @@ class DroneControl:
 
     def process_mission(self):
         """ 
-        when mission received from GCS passed to this fn
+        This function will sit and wait for a mission to be received from the GCS
         this function must process and set as the mission on the flight controller (FC)
+        If the mission requests data logging then it will also need to be triggered here.
         """
+
 
     def battery_load(self):
         """
