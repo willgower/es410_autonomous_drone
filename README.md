@@ -26,6 +26,6 @@ When drone is in **idle** state,
 | Command | Description |
 |---------|-------------|
 |`shutdown`| shutdown drone |
-|`mission`^ | send mission|
+|`mission`† | send mission|
 
-^ mission command should be of the following form ????
+† After mission command, mission details must be received within 5 seconds. Details should be of the following form ????
