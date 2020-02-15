@@ -17,7 +17,7 @@ class FlightController:
         """
         self.initSuccessful = False  # Assume connection fails
         try:
-            dronekit.connect('/dev/ttyUSB0', heartbeat_timeout=15)
+            dronekit.connect('/dev/ttyACM0', heartbeat_timeout=15)
             print("Successfully connected to Pixhawk!")
         except socket.error:  # Bad TCP connection
             print('No server exists!')
