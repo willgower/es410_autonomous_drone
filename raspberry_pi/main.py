@@ -10,6 +10,8 @@ from raspberry_pi.data_logging import DataLogging
 from raspberry_pi.landing_vision import LandingVision
 
 import sys
+import json
+import time
 
 class DroneControl:
     def __init__(self):
@@ -47,6 +49,7 @@ class DroneControl:
         was not established, drone should have other means of reporting initialisation failure
         """
         # Flash some LEDs!
+        # ...for a few seconds then return control to parent function to end program
 
     def report(self, message):
         """
@@ -71,10 +74,30 @@ class DroneControl:
                 else - error so abort
         if mission, then save the mission command as a property
         """
-        drone.report("Drone is idle. Waiting for command")
+        self.report("Drone is idle. Waiting for command")
 
-        cmd = ""
+        cmd = -1
+        while cmd == -1:
+            # msg will be type None if no message to read
+            msg = self.gcs.read_message()
+            
+            if msg == "shutdown":
+                cmd = 0
+            elif msg == "mission":
+                # mission command recieved, waiting for mission details.
+                missionMessage = None
+                start = time.perf_counter()
 
+                # timeout after 5 sec
+                while time.perf_counter() - start < 5:
+                    missionMessage = self.gcs.read_message()
+                    if missionMessage != None: 
+                        self.recvdMission = json.loads(missionMessage)
+                        cmd = 1
+                        break
+                else:
+                    self.report("Wait for mission details timed out after 5 seconds")
+                
         return cmd
 
     def process_mission(self):
@@ -152,6 +175,13 @@ class DroneControl:
         close communication ports and 
         perform clean shutdown of electronics running from secondary battery
         """
+
+        #
+        # some stuff here
+        #
+
+        # exit program
+        sys.exit()
 
 
 
