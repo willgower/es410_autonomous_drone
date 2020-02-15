@@ -5,7 +5,6 @@
 
 import dronekit
 import socket
-import exceptions
 
 
 class FlightController:
@@ -22,7 +21,7 @@ class FlightController:
             print("Successfully connected to Pixhawk!")
         except socket.error:  # Bad TCP connection
             print('No server exists!')
-        except exceptions.OSError as e:  # Bad TTY connection
+        except OSError as e:  # Bad TTY connection
             print('No serial exists!')
         except dronekit.APIException:  # API Error
             print('Timeout!')
