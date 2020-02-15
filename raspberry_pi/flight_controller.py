@@ -10,7 +10,10 @@ class FlightController:
         """
         Initialise module wide variables and objects.
         Start MAVLink connection to the Pixhawk
+        Set flag for successful initialisation
         """
+
+        self.initSuccessful = True
 
     def set_destination(self, location):
         """

@@ -3,12 +3,14 @@
 # File: micro_controller.py
 # Description: Module to handle serial connection to the Arduino
 
-class MicroController():
+class MicroController:
     def __init__(self):
         """
         establish communication to arduino (timeout = 5 s)
         get confirmation from arduino that grippers are open
+        Set flag for successful initialisation
         """
+        self.initSuccessful = True
 
     def set_mode(self, mode):
         """
