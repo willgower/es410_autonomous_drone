@@ -17,7 +17,7 @@ class FlightController:
         """
         self.initSuccessful = False  # Assume connection fails
         try:
-            dronekit.connect('/dev/ttyACM0', heartbeat_timeout=15)
+            self.vehicle = dronekit.connect('/dev/ttyACM0', heartbeat_timeout=15)
             print("Successfully connected to Pixhawk!")
         except socket.error:  # Bad TCP connection
             print('No server exists!')
@@ -51,6 +51,54 @@ class FlightController:
         Return a json object containing all of the flight controller information
         such as battery level, altitude, GPS, velocity.
         """
+        self.vehicle.wait_ready('autopilot_version')
+
+        # Get all vehicle attributes (state)
+        print("\nGet all vehicle attribute values:")
+        print(" Autopilot Firmware version: %s" % self.vehicle.version)
+        print("   Major version number: %s" % self.vehicle.version.major)
+        print("   Minor version number: %s" % self.vehicle.version.minor)
+        print("   Patch version number: %s" % self.vehicle.version.patch)
+        print("   Release type: %s" % self.vehicle.version.release_type())
+        print("   Release version: %s" % self.vehicle.version.release_version())
+        print("   Stable release?: %s" % self.vehicle.version.is_stable())
+        print(" Autopilot capabilities")
+        print("   Supports MISSION_FLOAT message type: %s" % self.vehicle.capabilities.mission_float)
+        print("   Supports PARAM_FLOAT message type: %s" % self.vehicle.capabilities.param_float)
+        print("   Supports MISSION_INT message type: %s" % self.vehicle.capabilities.mission_int)
+        print("   Supports COMMAND_INT message type: %s" % self.vehicle.capabilities.command_int)
+        print("   Supports PARAM_UNION message type: %s" % self.vehicle.capabilities.param_union)
+        print("   Supports ftp for file transfers: %s" % self.vehicle.capabilities.ftp)
+        print("   Supports commanding attitude offboard: %s" % self.vehicle.capabilities.set_attitude_target)
+        print(
+            "   Supports commanding position and velocity targets in local NED frame: %s" % self.vehicle.capabilities.set_attitude_target_local_ned)
+        print(
+            "   Supports set position + velocity targets in global scaled integers: %s" % self.vehicle.capabilities.set_altitude_target_global_int)
+        print("   Supports terrain protocol / data handling: %s" % self.vehicle.capabilities.terrain)
+        print("   Supports direct actuator control: %s" % self.vehicle.capabilities.set_actuator_target)
+        print("   Supports the flight termination command: %s" % self.vehicle.capabilities.flight_termination)
+        print("   Supports mission_float message type: %s" % self.vehicle.capabilities.mission_float)
+        print("   Supports onboard compass calibration: %s" % self.vehicle.capabilities.compass_calibration)
+        print(" Global Location: %s" % self.vehicle.location.global_frame)
+        print(" Global Location (relative altitude): %s" % self.vehicle.location.global_relative_frame)
+        print(" Local Location: %s" % self.vehicle.location.local_frame)
+        print(" Attitude: %s" % self.vehicle.attitude)
+        print(" Velocity: %s" % self.vehicle.velocity)
+        print(" GPS: %s" % self.vehicle.gps_0)
+        print(" Gimbal status: %s" % self.vehicle.gimbal)
+        print(" Battery: %s" % self.vehicle.battery)
+        print(" EKF OK?: %s" % self.vehicle.ekf_ok)
+        print(" Last Heartbeat: %s" % self.vehicle.last_heartbeat)
+        print(" Rangefinder: %s" % self.vehicle.rangefinder)
+        print(" Rangefinder distance: %s" % self.vehicle.rangefinder.distance)
+        print(" Rangefinder voltage: %s" % self.vehicle.rangefinder.voltage)
+        print(" Heading: %s" % self.vehicle.heading)
+        print(" Is Armable?: %s" % self.vehicle.is_armable)
+        print(" System status: %s" % self.vehicle.system_status.state)
+        print(" Groundspeed: %s" % self.vehicle.groundspeed)  # settable
+        print(" Airspeed: %s" % self.vehicle.airspeed)  # settable
+        print(" Mode: %s" % self.vehicle.mode.name)  # settable
+        print(" Armed: %s" % self.vehicle.armed)  # settable
 
     def get_hwss_status(self):
         """
@@ -80,4 +128,4 @@ class FlightController:
 
 if __name__ == "__main__":
     fc = FlightController()
-    print(fc.initSuccessful)
+    fc.get_fc_status()
