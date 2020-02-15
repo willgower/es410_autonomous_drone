@@ -12,6 +12,7 @@ from raspberry_pi.landing_vision import LandingVision
 import sys
 import json
 import time
+import os
 
 
 class DroneControl:
@@ -44,6 +45,9 @@ class DroneControl:
             self.report("Link to uC failed")
             raise ValueError("Failed to communicate with Micro Controller")
 
+        self.logger = DataLogging()
+        self.vision = LandingVision()
+
     def alert_initialisation_failure(self):
         """
         in case communication to the ground control station (GCS)
@@ -72,6 +76,7 @@ class DroneControl:
         drone is in idle state waiting for a command
         return: 0 - shutdown
                 1 - mission
+                2 - reboot
                 else - error so abort
         if mission, then save the mission command as a property
         """
@@ -84,6 +89,8 @@ class DroneControl:
             
             if msg == "shutdown":
                 cmd = 0
+            elif msg == "reboot":
+                cmd = 2
             elif msg == "mission":
                 # mission command recieved, waiting for mission details.
                 missionMessage = None
@@ -98,6 +105,7 @@ class DroneControl:
                         break
                 else:
                     self.report("Wait for mission details timed out after 5 seconds")
+                    self.abort()
                 
         return cmd
 
@@ -115,6 +123,26 @@ class DroneControl:
         poll FC to determine if loaded
         timeout after 30 s
         """
+        self.report("Waiting for battery to be loaded.")
+
+        # wait for battery connection
+        start = time.perf_counter()
+        while time.perf_counter() - start < 20:
+            if self.fc.is_battery_connected(): 
+                self.report("Battery connected.")
+                break
+        else:
+            self.report("Battery not connected within 20 seconds.")
+        
+        # wait for battery secured confirmation
+        start = time.perf_counter()
+        while time.perf_counter() - start < 20:
+            if self.gcs.read_message() == "battery secured": 
+                self.report("Battery Loaded.")
+                break
+        else:
+            self.report("Battery secured confirmation not received within 20 seconds.")
+            self.abort()
 
     def parcel_load(self):
         """
@@ -124,6 +152,22 @@ class DroneControl:
         on exit, disable parcel load
         timeout after 30 s
         """
+        
+        # open grippers to accept parcel
+        self.uC.open_grippers()
+        # put in parcel loading mode
+        self.uC.set_mode(2)
+
+        # wait until parcel is loaded - timeout 30 s
+        timeout = 30
+        start = time.perf_counter()
+        while time.perf_counter() - start < timeout:
+            if self.uC.is_parcel_loaded(): 
+                self.report("Parcel Loaded.")
+                break
+        else:
+            self.report("Parcel not loaded within " + timeout + " seconds.")
+            self.abort()
 
     def check_armable(self):
         """
@@ -176,14 +220,26 @@ class DroneControl:
         close communication ports and 
         perform clean shutdown of electronics running from secondary battery
         """
+        self.report("Drone is shutting down.")
+        self.__prepare_exit()
+        # shutdown raspberry pi
+        os.system('sudo shutdown now')
 
-        #
-        # some stuff here
-        #
+    def reboot(self):
+        """
+        close communication ports and reboot drone control components
+        good incase we need to reset anything
+        """
+        self.report("Drone is rebooting.")
+        self.__prepare_exit()
+        # reboot raspberry pi
+        os.system('sudo shutdown -r now')
 
-        # exit program
-        sys.exit()
-
+    def __prepare_exit(self):
+        self.logger.close()
+        self.uC.close()
+        self.fc.close()
+        self.gcs.close()
 
 if __name__ == "__main__":
     # === INITIALISATION ===
@@ -194,6 +250,8 @@ if __name__ == "__main__":
     except ValueError as error:
         print(error)
         sys.exit()
+    else:
+        drone.report("Initialisation successful.")
 
     # if exception raised in initialisation then this will not execute because sys.exit()
     while True:
@@ -206,6 +264,8 @@ if __name__ == "__main__":
             drone.shutdown()
         elif cmd == 1:
             drone.process_mission()
+        elif cmd == 2:
+            drone.reboot()
         else:
             # should never happen
             print("Aborting... Why has this happened?")
