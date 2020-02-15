@@ -44,9 +44,6 @@ class DroneControl:
         # no reason for these classes to fail to initialise
         self.logger = DataLogging()
         self.vision = LandingVision()
-        
-
-
 
     def alert_initialisation_failure(self):
         """
