@@ -19,6 +19,7 @@ class FlightController:
         self.initSuccessful = False  # Assume connection fails
         try:
             dronekit.connect('/dev/serial/by-id/usb-ArduPilot_fmuv2_390030000E51373337333031', heartbeat_timeout=15)
+            print("Successfully connected to Pixhawk!")
         except socket.error:  # Bad TCP connection
             print('No server exists!')
         except exceptions.OSError as e:  # Bad TTY connection
@@ -77,3 +78,7 @@ class FlightController:
         Provide low level 'joystick style' commands to the drone.
         """
 
+
+if __name__ == "main":
+    fc = FlightController
+    print(fc.initSuccessful)
