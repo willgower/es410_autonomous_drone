@@ -58,12 +58,12 @@ class FlightController:
         such as battery level, altitude, GPS, velocity.
         """
         fc_data = {
-            "Global Location": self.vehicle.location.global_frame,
-            "Velocity": self.vehicle.velocity,
-            "GPS": self.vehicle.gps_0,
-            "Battery": self.vehicle.battery,
-            "Groundspeed": self.vehicle.groundspeed,
-            "Airspeed": self.vehicle.airspeed
+            "Global Location": str(self.vehicle.location.global_frame),
+            "Velocity": str(self.vehicle.velocity),
+            "GPS": str(self.vehicle.gps_0),
+            "Battery": str(self.vehicle.battery),
+            "Groundspeed": str(self.vehicle.groundspeed),
+            "Airspeed": str(self.vehicle.airspeed)
         }
 
         fc_data_encoded = json.JSONEncoder().encode(fc_data)
