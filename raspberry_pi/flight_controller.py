@@ -8,6 +8,7 @@ from pymavlink import mavutil
 import socket
 import json
 
+
 class FlightController:
     def __init__(self):
         """
@@ -35,7 +36,15 @@ class FlightController:
         else:
             self.initSuccessful = True
 
-        self.vehicle.mode = 'AUTO'
+        self.vehicle.mode = 'AUTO'  # Set the default vehicle mode
+
+        self.locations = {}
+        with open('locations.txt', 'r') as file:
+            for line in file.readlines():
+                name = line[:line.find(":")].strip()
+                lat = line[line.find(":") + 2:line.find(",")].strip()
+                long = line[line.find(",") + 1:].strip()
+                self.locations[name] = (lat, long)
 
     def set_destination(self, location):
         """
@@ -75,7 +84,6 @@ class FlightController:
         """
         Get the status of the hardware safety switch.
         """
-        return self.vehicle.
 
     def get_arm_status(self):
         """
@@ -108,8 +116,8 @@ class FlightController:
             0b0000111111000111,                             # type_mask (only speeds enabled)
             0, 0, 0,                                        # x, y, z positions
             velocity_x, velocity_y, velocity_z,             # x, y, z velocity in m/s
-            0, 0, 0,                                        # x, y, z acceleration (not supported yet, ignored in GCS_Mavlink)
-            0, 0)                                           # yaw, yaw_rate (not supported yet, ignored in GCS_Mavlink)
+            0, 0, 0,                                        # x, y, z acceleration (not supported yet)
+            0, 0)                                           # yaw, yaw_rate (not supported yet)
 
         self.vehicle.send_mavlink(msg)  # Send the command to the vehicle
 
