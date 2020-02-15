@@ -16,3 +16,16 @@ Arduino
     
 Ground Control Station
 - base_station.py
+
+## User Guide
+
+### Drone
+_mostly written for the benefit of whoever writes the GCS code_
+
+When drone is in **idle** state,
+| Command | Description |
+|---------|-------------|
+|`shutdown`| shutdown drone |
+|`mission`^ | send mission|
+
+^ mission command should be of the following form ????
