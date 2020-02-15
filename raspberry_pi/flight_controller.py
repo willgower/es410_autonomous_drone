@@ -13,10 +13,11 @@ class FlightController:
         Initialise module wide variables and objects.
         Start MAVLink connection to the Pixhawk
         Set flag for successful initialisation
+        /dev/serial/by-id/usb-ArduPilot_fmuv2_390030000E51373337333031
         """
         self.initSuccessful = False  # Assume connection fails
         try:
-            dronekit.connect('/dev/serial/by-id/usb-ArduPilot_fmuv2_390030000E51373337333031', heartbeat_timeout=15)
+            dronekit.connect('/dev/ttyUSB0', heartbeat_timeout=15)
             print("Successfully connected to Pixhawk!")
         except socket.error:  # Bad TCP connection
             print('No server exists!')
