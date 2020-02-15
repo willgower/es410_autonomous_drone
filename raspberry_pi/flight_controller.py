@@ -3,6 +3,10 @@
 # File: flight_controller.py
 # Description: Module to handle MAVLink communication to the Pixhawk
 
+import dronekit
+import socket
+import exceptions
+
 
 class FlightController:
 
@@ -12,8 +16,19 @@ class FlightController:
         Start MAVLink connection to the Pixhawk
         Set flag for successful initialisation
         """
-
-        self.initSuccessful = True
+        self.initSuccessful = False  # Assume connection fails
+        try:
+            dronekit.connect('/dev/serial/by-id/usb-ArduPilot_fmuv2_390030000E51373337333031', heartbeat_timeout=15)
+        except socket.error:  # Bad TCP connection
+            print('No server exists!')
+        except exceptions.OSError as e:  # Bad TTY connection
+            print('No serial exists!')
+        except dronekit.APIException:  # API Error
+            print('Timeout!')
+        except:  # Other error
+            print('Some other error!')
+        else:
+            self.initSuccessful = True
 
     def set_destination(self, location):
         """
