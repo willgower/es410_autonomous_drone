@@ -8,7 +8,6 @@ import socket
 
 
 class FlightController:
-
     def __init__(self):
         """
         Initialise module wide variables and objects.
@@ -78,6 +77,6 @@ class FlightController:
         """
 
 
-if __name__ == "main":
-    fc = FlightController
+if __name__ == "__main__":
+    fc = FlightController()
     print(fc.initSuccessful)
