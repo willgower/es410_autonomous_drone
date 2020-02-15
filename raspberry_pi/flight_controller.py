@@ -21,14 +21,20 @@ class FlightController:
             print("Successfully connected to Pixhawk!")
         except socket.error:  # Bad TCP connection
             print('No server exists!')
+            return
         except OSError as e:  # Bad TTY connection
             print('No serial exists!')
+            return
         except dronekit.APIException:  # API Error
             print('Timeout!')
+            return
         except:  # Other error
             print('Some other error!')
+            return
         else:
             self.initSuccessful = True
+
+        self.vehicle.mode = 'AUTO'
 
     def set_destination(self, location):
         """

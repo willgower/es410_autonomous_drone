@@ -13,6 +13,7 @@ import sys
 import json
 import time
 
+
 class DroneControl:
     def __init__(self):
         """
@@ -184,8 +185,7 @@ class DroneControl:
         sys.exit()
 
 
-
-if __name__=="__main__":
+if __name__ == "__main__":
     # === INITIALISATION ===
     # try to initialise drone
     # if fail then print error and exit program
