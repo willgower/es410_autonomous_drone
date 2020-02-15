@@ -13,11 +13,11 @@ import sys
 
 class DroneControl:
     def __init__(self):
-        #"""
-        #instantiate objects 
-        #this process will establish communication links
-        #if fail then raise an exception that will terminate the program
-        #"""
+        """
+        instantiate objects 
+        this process will establish communication links
+        if fail then raise an exception that will terminate the program
+        """
 
         self.gcs = GroundControlStation()
         if self.gcs.initSuccessful:
