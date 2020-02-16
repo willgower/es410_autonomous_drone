@@ -56,6 +56,13 @@ class FlightController:
         Land the drone in the exact position.
         """
 
+    def is_drone_at_destination(self):
+        """
+        added by JRB
+        please return true or false
+        this is to allow drone to go into guided state
+        """
+
     def set_battery_capacity(self, mah):
         """
         Set the size of the battery capacity in mAh.

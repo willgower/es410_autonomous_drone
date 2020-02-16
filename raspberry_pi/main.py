@@ -8,6 +8,7 @@ from raspberry_pi.ground_communication import GroundControlStation
 from raspberry_pi.micro_controller import MicroController
 from raspberry_pi.data_logging import DataLogging
 from raspberry_pi.landing_vision import LandingVision
+from raspberry_pi.recurring_timer import RecurringTimer
 
 import sys
 import json
@@ -228,7 +229,37 @@ class DroneControl:
         facilitate logging
         report to base
         continue when loiter point reached
+        """                
+        
+        self.logger.prepare_for_logging()
+        
+        # setup timer
+        interval = 1 # second
+        # this will start timer also
+        self.recTimer = RecurringTimer(interval, self.__monitor_flight)
+        
+        self.report("Drone is taking off...")
+        self.fc.begin_flight()
+
+        while self.fc.is_drone_at_destination(): # needs to determine when drone is ready for guidance
+            #do some stuff
+            time.sleep(0.1)
+
+        self.report("Drone at destination. Entering guidance mode.")
+
+    def __monitor_flight(self):
         """
+        """
+        # set timer so that it runs recursively
+        self.timer.start()
+        
+        # get details to log
+        fc_status = self.fc.get_fc_status()
+        current = self.uC.get_current()
+
+        self.logger.log_info(current, fc_status)
+
+        self.report("Drone flying. Progress: ???")
 
     def guide_to_target(self):
         """
@@ -238,6 +269,14 @@ class DroneControl:
         continue logging and reporting
         when above location, land drone
         """
+        #
+        # do some stuff
+        #
+
+        self.report("Initiating landing.")
+        self.fc.land()
+        self.recTimer.stop()
+        self.logger.finish_logging()
 
     def release_parcel(self):
         """
@@ -278,6 +317,7 @@ class DroneControl:
         self.uC.close()
         self.fc.close()
         self.gcs.close()
+
 
 if __name__ == "__main__":
     # === INITIALISATION ===

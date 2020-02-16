@@ -49,12 +49,27 @@ class DataLogging:
         self.t.cancel()
         self.data_file.close()
 
+    def prepare_for_logging(self):
+        """
+        open file
+        write a header
+        """
+
+    def log_info(self, current, fc_status):
+        """
+        function should save information to a file in appropriate format
+        """
+        
+    def finish_logging(self):
+        """
+        flight finished, close file
+        """
+
     def close(self):
         """
         prepare for system shutdown
         Will - or does the above method do this?
         """
-
 
 if __name__ == "__main__":
     data_logging = DataLogging()
