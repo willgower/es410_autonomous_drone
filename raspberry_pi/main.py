@@ -159,6 +159,7 @@ class DroneControl:
         self.uC.set_mode(2)
 
         # wait until parcel is loaded - timeout 30 s
+        self.report("Waiting for parcel to be loaded.")
         timeout = 30
         start = time.perf_counter()
         while time.perf_counter() - start < timeout:
@@ -175,17 +176,51 @@ class DroneControl:
         note, hardware safety switch is pressed after this
         """
 
+        ### What other checks should be done?
+        # verify battery and package load?
+        # verify mission uploaded?
+
+        if not self.fc.get_arm_status():
+            self.report("Arming check failed.")
+            self.abort()
+        else:
+            self.report("Drone ready to arm.")
+
     def wait_for_safety_switch(self):
         """
         loop to until hardware safety switch is pressed
         timeout after 30 s
         """
+        self.report("Waiting for hardware safety switch to be pressed.")
+        
+        # wait for hardware safety switch to be pressed - timeout 30 s
+        timeout = 30
+        start = time.perf_counter()
+        while time.perf_counter() - start < timeout:
+            if self.fc.get_hwss_status(): 
+                self.report("Switch pressed.")
+                break
+        else:
+            self.report("Switch press timed out.")
+            self.abort()
 
     def wait_for_flight_authorisation(self):
         """
         wait for authorisation from ground control station to begin flight
         timeout after 30 s
         """
+        self.report("Waiting for authorisation to fly.")
+        
+        # wait for message authorising flight - timeout 30 s
+        timeout = 30
+        start = time.perf_counter()
+        while time.perf_counter() - start < timeout:
+            if self.gcs.read_message() == "battery secured": 
+                self.report("Authorisation received.")
+                break
+        else:
+            self.report("Authorisation window timed out.")
+            self.abort()
 
     def takeoff_and_monitor_flight(self):
         """
@@ -204,10 +239,13 @@ class DroneControl:
         when above location, land drone
         """
 
-    def release_package(self):
+    def release_parcel(self):
         """
         open the grippers to release the package
         """
+        self.report("Releasing parcel.")
+        self.uC.open_grippers() # blocking function
+        self.report("Parcel released.")
 
     def upload_return_mission(self):
         """
@@ -252,7 +290,7 @@ if __name__ == "__main__":
         sys.exit()
     else:
         drone.report("Initialisation successful.")
-
+        
     # if exception raised in initialisation then this will not execute because sys.exit()
     while True:
         # === IDLE ===
@@ -292,9 +330,11 @@ if __name__ == "__main__":
 
         # state: wait for hardware safety switch pressed
         drone.wait_for_safety_switch()
+        # pause for 5 seconds to prevent immediate arming
+        time.sleep(5)
 
         if drone.abortFlag: continue
-
+        
         # state: wait for take off authorisation
         drone.wait_for_flight_authorisation()
 

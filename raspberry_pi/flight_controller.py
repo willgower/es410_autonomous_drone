@@ -82,6 +82,7 @@ class FlightController:
     def get_hwss_status(self):
         """
         Get the status of the hardware safety switch.
+        Return true if pressed
         """
 
     def get_arm_status(self):
