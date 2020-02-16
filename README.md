@@ -39,3 +39,33 @@ Battery must be connected in 20 seconds. GCS must confirm battery has been secur
 
 #### State: Wait for parcel load
 Parcel must be loaded within 30 seconds.
+
+#### State: Check drone is armable
+Currently just gets this from pixhawk, unsure if further checks should be done
+| Result | Return | 
+|---------|-------------|
+|Checks Passed| `Drone ready to arm.` |
+|Checks Failed| `Arming check failed.` |
+
+#### State: Waiting for HWSS
+Switch must be pressed within 30 s
+| Description | Message sent | 
+|---------|-------------|
+| On state entry | `Waiting for hardware safety switch to be pressed.`|
+| When switch pressed | `Switch pressed.`|
+| Timeout | `Switch press timed out.`|
+
+Between states (after switch is pressed) a pause of 5 seconds happens to prevent immediate arming of the drone.
+
+#### State: Waiting for flight authorisation
+Authorisation must be received within 30 s
+| Description | Message sent | 
+|---------|-------------|
+| On state entry | `Waiting for authorisation to fly.`|
+| Authorisation message received | `Authorisation received.`|
+| Timeout | `Authorisation window timed out.`|
+
+#### State: Release parcel
+On entry: `Releasing parcel.`
+
+On completion: `Parcel released.`
