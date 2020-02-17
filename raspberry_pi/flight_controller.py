@@ -7,6 +7,7 @@ import dronekit
 from pymavlink import mavutil
 import socket
 import json
+import time
 
 
 class FlightController:
@@ -55,6 +56,7 @@ class FlightController:
         """
         Land the drone in the exact position.
         """
+        self.vehicle.mode = "LAND"
 
     def is_drone_at_destination(self):
         """
@@ -67,6 +69,15 @@ class FlightController:
         """
         Set the size of the battery capacity in mAh.
         """
+
+    def is_battery_connected(self):
+        """
+        Returns true or false if the battery is connected
+        """
+        if self.vehicle.battery[0] is not None:  # This might not work - needs testing!
+            return True
+        else:
+            return False
 
     def get_fc_status(self):
         """
@@ -102,6 +113,23 @@ class FlightController:
         """
         Run the take off and mission starting commands.
         """
+        # Copter should arm in GUIDED mode
+        self.vehicle.mode = "GUIDED"
+        self.vehicle.armed = True
+
+        while not self.vehicle.armed:
+            time.sleep(1)
+
+        self.vehicle.simple_takeoff(30)  # Take off to 30m
+
+        # THIS IS CURRENTLY BLOCKING BUT IT SHOULDNT BE
+        # NEEDS TO HAND POWER BACK TO MAIN SCRIPT
+
+        while True:
+            if self.vehicle.location.global_relative_frame.alt >= 28:  # Trigger just below 30m
+                print("Reached target altitude")
+                break
+            time.sleep(1)
 
     def change_flight_mode(self, flight_mode):
         """
