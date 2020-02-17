@@ -18,8 +18,10 @@ class LandingVision:
         over to you Aaron...
         """
 
-    def get_instruction(self):
+    def get_instruction(self, altitude):
         """
         neccessary input arguments to be added
         should return an instruction of where to fly to
         """
+
+        return x_vel, y_vel, yaw_vel

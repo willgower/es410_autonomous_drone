@@ -6,8 +6,8 @@
 import dronekit
 from pymavlink import mavutil
 import socket
-import json
 import time
+import os
 
 
 class FlightController:
@@ -46,11 +46,16 @@ class FlightController:
                 long = line[line.find(",") + 1:].strip()
                 self.locations[name] = (lat, long)
 
+        self.mission_lat = None
+        self.mission_lon = None
+
     def set_destination(self, location):
         """
         Takes in a string of a location from a predefined list.
         E.g. "bluebell", "claycroft", "test_point_A", "test_point_B"
         """
+        self.mission_lon = self.locations[location][0]
+        self.mission_lat = self.locations[location][1]
 
     def land(self):
         """
@@ -79,23 +84,32 @@ class FlightController:
         else:
             return False
 
-    def get_fc_status(self):
+    def get_fc_stats(self):
         """
-        Return a json object containing all of the flight controller information
-        such as battery level, altitude, GPS, velocity.
+        Return a dictionary containing all of the flight controller information including:
+            - Global Location
+            - Velocity
+            - GPS
+            - Battery voltage
+            - Groundspeed
+            - Airspeed
         """
         fc_data = {
-            "Global Location": str(self.vehicle.location.global_frame),
+            "Location lon": str(self.vehicle.location.global_frame.lon),
+            "Location lat": str(self.vehicle.location.global_frame.lat),
+            "Location alt": str(self.vehicle.location.global_frame.alt),
+            "Range Finder Height": self.vehicle.rangefinder,
+            "Distance to waypoint": 0,
             "Velocity": str(self.vehicle.velocity),
-            "GPS": str(self.vehicle.gps_0),
-            "Battery": str(self.vehicle.battery),
+            "Displacement": 0,
+            "Battery": str(self.vehicle.battery.voltage),
             "Groundspeed": str(self.vehicle.groundspeed),
             "Airspeed": str(self.vehicle.airspeed)
         }
 
-        fc_data_encoded = json.JSONEncoder().encode(fc_data)
+        # fc_data_encoded = json.JSONEncoder().encode(fc_data)
 
-        return fc_data_encoded
+        return fc_data
 
     def get_hwss_status(self):
         """
@@ -103,7 +117,7 @@ class FlightController:
         Return true if pressed
         """
 
-    def get_arm_status(self):
+    def get_armmable_status(self):
         """
         Return whether or not the drone is armable.
         """
@@ -120,16 +134,28 @@ class FlightController:
         while not self.vehicle.armed:
             time.sleep(1)
 
-        self.vehicle.simple_takeoff(30)  # Take off to 30m
+        self.vehicle.simple_takeoff(10)  # Take off to 9m
 
-        # THIS IS CURRENTLY BLOCKING BUT IT SHOULDNT BE
-        # NEEDS TO HAND POWER BACK TO MAIN SCRIPT
+    def fly_to_location(self):
+        """
+        Start the traversing stage of flight
+        """
+        location = dronekit.LocationGlobalRelative(self.mission_lat,  # Mission latitude
+                                                   self.mission_lon,  # Mission longitude
+                                                   10                 # Mission altitude
+                                                   )
+        self.vehicle.simple_goto(location)
 
-        while True:
-            if self.vehicle.location.global_relative_frame.alt >= 28:  # Trigger just below 30m
-                print("Reached target altitude")
-                break
-            time.sleep(1)
+    def get_distance_left(self):
+        """
+        Return the horizontal distance to the next waypoint
+        """
+
+    def get_altitude(self):
+        """
+        Returns the current flight altitude
+        """
+        return self.vehicle.location.global_frame.alt
 
     def change_flight_mode(self, flight_mode):
         """
