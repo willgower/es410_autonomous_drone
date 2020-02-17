@@ -1,13 +1,14 @@
+# thanks to MestreLion https://stackoverflow.com/a/13151299
 from threading import Timer
 
-# thanks to MestreLion https://stackoverflow.com/a/13151299
+
 class RecurringTimer(object):
     def __init__(self, interval, function, *args, **kwargs):
-        self._timer     = None
-        self.interval   = interval
-        self.function   = function
-        self.args       = args
-        self.kwargs     = kwargs
+        self._timer = None
+        self.interval = interval
+        self.function = function
+        self.args = args
+        self.kwargs = kwargs
         self.is_running = False
         self.start()
 

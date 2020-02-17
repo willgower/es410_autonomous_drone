@@ -16,7 +16,6 @@ import time
 import os
 
 
-
 class DroneControl:
     def __init__(self):
         """
@@ -49,6 +48,10 @@ class DroneControl:
 
         self.logger = DataLogging()
         self.vision = LandingVision()
+
+        # Setting up class attributes
+        self.abortFlag = None
+        self.mission_title = ""
 
     def alert_initialisation_failure(self):
         """
@@ -118,7 +121,6 @@ class DroneControl:
         If the mission requests data logging then it will also need to be triggered here.
         """
         self.mission_title = "Mission Name Here"  # GCS will provide a mission name for logging purposes
-
 
     def battery_load(self):
         """
