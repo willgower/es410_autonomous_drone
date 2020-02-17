@@ -116,6 +116,7 @@ class DroneControl:
         this function must process and set as the mission on the flight controller (FC)
         If the mission requests data logging then it will also need to be triggered here.
         """
+        self.mission_title = "Mission Name Here"  # GCS will provide a mission name for logging purposes
 
 
     def battery_load(self):
@@ -231,27 +232,28 @@ class DroneControl:
         continue when loiter point reached
         """                
         
-        self.logger.prepare_for_logging()
+        self.logger.prepare_for_logging(self.mission_title)
         
         # setup timer
-        interval = 1 # second
+        interval = 1  # second
         # this will start timer also
         self.recTimer = RecurringTimer(interval, self.__monitor_flight)
         
         self.report("Drone is taking off...")
         self.fc.begin_flight()
 
-        while self.fc.is_drone_at_destination(): # needs to determine when drone is ready for guidance
-            #do some stuff
+        while self.fc.is_drone_at_destination():  # needs to determine when drone is ready for guidance
+            # do some stuff
             time.sleep(0.1)
 
         self.report("Drone at destination. Entering guidance mode.")
 
     def __monitor_flight(self):
         """
+        Get flight data from various places and send them to the data logging module
         """
         # set timer so that it runs recursively
-        self.timer.start()
+        self.recTimer.start()
         
         # get details to log
         fc_status = self.fc.get_fc_status()
