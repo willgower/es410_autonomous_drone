@@ -52,6 +52,13 @@ class DroneControl:
         # Setting up class attributes
         self.abortFlag = None
         self.mission_title = ""
+		self.state = None
+
+		# dictionary of flight parameters
+		self.parameters = {
+			"traverse_alt" : 10,
+
+		}
 
     def alert_initialisation_failure(self):
         """
@@ -185,7 +192,7 @@ class DroneControl:
         # verify battery and package load?
         # verify mission uploaded?
 
-        if not self.fc.get_arm_status():
+        if not self.fc.get_armable_status():
             self.report("Arming check failed.")
             self.abort()
         else:
@@ -244,6 +251,17 @@ class DroneControl:
         
         self.report("Drone is taking off...")
         self.fc.begin_flight()
+		self.report("Drone has taken off.")
+
+		# loop until drone is almost at traverse altitude
+		self.state = "Ascending"
+		while self.fc.get_altitude() < self.parameters["traverse_alt"] * 0.95:
+			time.sleep(0.1)
+
+		# loop until drone is almost at traverse altitude
+		self.state = "Traversing"
+		while self.fc.get_altitude() < self.parameters["traverse_alt"] * 0.95:
+			time.sleep(0.1)
 
         while self.fc.is_drone_at_destination():  # needs to determine when drone is ready for guidance
             # do some stuff
@@ -259,10 +277,12 @@ class DroneControl:
         self.recTimer.start()
         
         # get details to log
-        fc_status = self.fc.get_fc_status()
+        fc_stats = self.fc.get_fc_stats()
         current = self.uC.get_current()
 
         self.logger.log_info(current, fc_status)
+
+		message = "State: " + self.state + "Altitude :" + fc_stats["Location alt"] + "Distance to waypoint :" + fc_stats[""] + "Battery Voltage (mV): " + fc_stats["Battery"]
 
         self.report("Drone flying. Progress: ???")
 
@@ -400,7 +420,7 @@ if __name__ == "__main__":
         drone.guide_to_target()
 
         drone.report("Flight complete. Drone at home.")
-
+	
     # end while
         
 
