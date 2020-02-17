@@ -280,7 +280,7 @@ class DroneControl:
         self.recTimer.stop()
         self.logger.finish_logging()
 
-    def release_parcel(self):
+    def release_package(self):
         """
         open the grippers to release the package
         """
@@ -392,7 +392,7 @@ if __name__ == "__main__":
 
         drone.upload_return_mission()
 
-        drone.takeoff_and_monitor_flight
+        drone.takeoff_and_monitor_flight()
 
         drone.guide_to_target()
 

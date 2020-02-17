@@ -11,6 +11,7 @@
 #   the get_instruction() method
 # =====================================
 
+
 class LandingVision:
     def __init__(self):
         """

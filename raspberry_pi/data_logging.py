@@ -23,6 +23,7 @@ class DataLogging:
         self.currently_logging = True
         self.data_file = open(self.file_path + name + ".csv", "w+")
         self.data_file.write("Logging started at " + datetime.now().strftime("%d-%m-%y at %H:%M:%S\n"))
+        self.data_file.write("Current, Location, Speed, Voltage\n")
 
     def log_info(self, current, fc_status):
         """
@@ -50,11 +51,14 @@ class DataLogging:
 
 
 if __name__ == "__main__":
+    from random import random, choice
+    from math import floor
+
     data_logging = DataLogging()
-    data_logging.prepare_for_logging("Local submodule test!")
+    data_logging.prepare_for_logging("test_2")
     for x in range(10):
         fc_data = {"voltage": str(x * 10),
-                   "location": "here",
-                   "velocity": "fast"}
+                   "location": str(floor(100 * random())),
+                   "velocity": choice(["fast", "slow", "average"])}
         data_logging.log_info(x + 1, json.JSONEncoder().encode(fc_data))
     data_logging.finish_logging()
