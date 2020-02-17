@@ -3,6 +3,7 @@
 # File: micro_controller.py
 # Description: Module to handle serial connection to the Arduino
 
+
 class MicroController:
     def __init__(self):
         """
