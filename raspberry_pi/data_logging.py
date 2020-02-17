@@ -3,76 +3,58 @@
 # File: data_logging.py
 # Description: Module to handle the logging of in flight data such as current readings against time.
 
-from threading import Timer
 from datetime import datetime
 import serial
+import json
+import os
 
 
 class DataLogging:
     def __init__(self):
-        self.file_path = "logging/"
+        self.currently_logging = False
+        self.file_path = os.getcwd() + "/logging/"
         self.data_file = None
-        self.t = None
-        self.started = False
-        self.delay = None
 
-        self.ser = serial.Serial("/dev/ttyUSB0", 115200)
-        self.ser.baudrate = 115200
-
-    def start(self, name, delay=0.25):
-        self.started = True
-        self.delay = delay
-        self.data_file = open(self.file_path + name + ".csv", "w")
-        self.data_file.write("Logging started at " + datetime.now().strftime("%d-%m-%y at %H:%M:%S\n"))
-        self.log_new_sample()
-
-    def log_new_sample(self):
-        read_ser = self.ser.readline().strip().decode('ascii')
-        if read_ser:
-            c_time = datetime.now().strftime("%H:%M:%S.%f")
-            current, voltage, location = read_ser.split(',')
-            velocity = "speed"
-            altitude = str(20)
-
-            sample = ",".join([c_time, current, voltage, location, velocity, altitude]) + "\n"
-        else:
-            sample = "None," * 6
-
-        self.data_file.write(sample)
-
-        self.t = Timer(self.delay, self.log_new_sample)
-        self.t.start()
-
-    def stop(self):
-        if not self.started:
-            return
-        self.t.cancel()
-        self.data_file.close()
-
-    def prepare_for_logging(self):
+    def prepare_for_logging(self, name):
         """
         open file
         write a header
         """
+        self.currently_logging = True
+        self.data_file = open(self.file_path + name + ".csv", "w+")
+        self.data_file.write("Logging started at " + datetime.now().strftime("%d-%m-%y at %H:%M:%S\n"))
 
     def log_info(self, current, fc_status):
         """
         function should save information to a file in appropriate format
         """
+        data = json.loads(fc_status)
+        data["current"] = str(current)
+
+        self.data_file.write(','.join(data.values()) + "\n")
         
     def finish_logging(self):
         """
         flight finished, close file
         """
+        self.data_file.close()
+        self.currently_logging = False
 
     def close(self):
         """
         prepare for system shutdown
-        Will - or does the above method do this?
+        If logging hasn't already been stopped - do this now
         """
+        if self.currently_logging:
+            self.finish_logging()
+
 
 if __name__ == "__main__":
     data_logging = DataLogging()
-    data_logging.start("next", 0.1)
-    time.sleep(5)
-    data_logging.stop()
+    data_logging.prepare_for_logging("Local submodule test!")
+    for x in range(10):
+        fc_data = {"voltage": str(x * 10),
+                   "location": "here",
+                   "velocity": "fast"}
+        data_logging.log_info(x + 1, json.JSONEncoder().encode(fc_data))
+    data_logging.finish_logging()
