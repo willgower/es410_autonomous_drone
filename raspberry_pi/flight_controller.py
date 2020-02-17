@@ -161,11 +161,12 @@ class FlightController:
         prepare for system shutdown
         stop processes, close communications and shutdown hardware where possible
         """
+        self.vehicle.close()
 
 
 if __name__ == "__main__":
     fc = FlightController()
     if fc.initSuccessful:
-        fc.get_fc_status()
+        print(fc.get_fc_status())
     else:
         quit()
