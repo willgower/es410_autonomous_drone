@@ -51,12 +51,14 @@ class DroneControl:
 
         # Setting up class attributes
         self.abortFlag = None
-        self.mission_title = ""
+        self.emergency_land = False
+		self.mission_title = ""
 		self.state = None
 
 		# dictionary of flight parameters
 		self.parameters = {
 			"traverse_alt" : 10,
+			"descent_vel" : 0.25
 
 		}
 
@@ -234,7 +236,7 @@ class DroneControl:
             self.report("Authorisation window timed out.")
             self.abort()
 
-    def takeoff_and_monitor_flight(self):
+    def execute_flight(self):
         """
         monitor drone status
         facilitate logging
@@ -247,7 +249,7 @@ class DroneControl:
         # setup timer
         interval = 1  # second
         # this will start timer also
-        self.recTimer = RecurringTimer(interval, self.__monitor_flight)
+        self.scheduler = RecurringTimer(interval, self.__monitor_flight)
         
         self.report("Drone is taking off...")
         self.fc.begin_flight()
@@ -260,14 +262,26 @@ class DroneControl:
 
 		# loop until drone is almost at traverse altitude
 		self.state = "Traversing"
-		while self.fc.get_altitude() < self.parameters["traverse_alt"] * 0.95:
+		while self.fc.get_distance_left() > 5:
 			time.sleep(0.1)
 
-        while self.fc.is_drone_at_destination():  # needs to determine when drone is ready for guidance
-            # do some stuff
-            time.sleep(0.1)
+		# descend 
+		self.fc.change_flight_mode("AUTO")
+		self.state = "Descending"
+		while (alt := self.fc.get_altitude) > 2:
+			# use vision system for guidance
+			x_vel, y_vel, yaw_vel = self.vision.get_instruction(alt)
+			z_vel = self.parameters["descent_vel"]
+			self.fc.move_relative(x_vel, y_vel, z_vel)
+			# so drone not at angle when picture taken
+			time.sleep(1)
 
-        self.report("Drone at destination. Entering guidance mode.")
+		# land
+		self.state = "Landing"
+		self.fc.land()
+
+		self.scheduler.stop()
+		self.logger.finish_logging()
 
     def __monitor_flight(self):
         """
@@ -276,32 +290,24 @@ class DroneControl:
         # set timer so that it runs recursively
         self.recTimer.start()
         
+		if self.gcs.read_message() == "emergency land":
+			while True:
+				self.fc.vehicle.mode = "LAND"
+				self.report("Drone executing emergency landing.")
+				time.sleep(1)
+				# then go and turn the drone off
+
         # get details to log
         fc_stats = self.fc.get_fc_stats()
         current = self.uC.get_current()
 
         self.logger.log_info(current, fc_status)
 
-		message = "State: " + self.state + "Altitude :" + fc_stats["Location alt"] + "Distance to waypoint :" + fc_stats[""] + "Battery Voltage (mV): " + fc_stats["Battery"]
-
-        self.report("Drone flying. Progress: ???")
-
-    def guide_to_target(self):
-        """
-        get drone state
-        pass to vision system to compute action
-        execute action by instructing FC
-        continue logging and reporting
-        when above location, land drone
-        """
-        #
-        # do some stuff
-        #
-
-        self.report("Initiating landing.")
-        self.fc.land()
-        self.recTimer.stop()
-        self.logger.finish_logging()
+		message = "State: " + self.state + \
+				  "Altitude :" + fc_stats["Location alt"] + \
+				  "Distance to waypoint :" + fc_stats[""] + \
+				  "Battery Voltage (mV): " + fc_stats["Battery"]
+        self.report(message)
 
     def release_package(self):
         """
@@ -316,6 +322,11 @@ class DroneControl:
         mission to return to base
         the mission will be executed using previously defined functions
         """
+		#
+		# some stuff here
+		#
+		prev_title = self.mission_title
+		self.mission_title = prev_title + "_return"
 
     def shutdown(self):
         """
@@ -407,17 +418,13 @@ if __name__ == "__main__":
 
         # === FLYING ===
         # state: flying
-        drone.takeoff_and_monitor_flight()
-
-        drone.guide_to_target()
+        drone.execute_flight()
 
         drone.release_package()
 
         drone.upload_return_mission()
 
-        drone.takeoff_and_monitor_flight()
-
-        drone.guide_to_target()
+        drone.execute_flight()
 
         drone.report("Flight complete. Drone at home.")
 	
