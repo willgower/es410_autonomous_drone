@@ -4,6 +4,6 @@
     "\\ground_control_station",
     "\\raspberry_pi"
   ],
-  "SelectedNode": "\\ground_control_station\\drone_communication.py",
+  "SelectedNode": "\\ground_control_station\\base_station.py",
   "PreviewInSolutionExplorer": false
 }
