@@ -1,8 +1,9 @@
 {
   "ExpandedNodes": [
     "",
+    "\\ground_control_station",
     "\\raspberry_pi"
   ],
-  "SelectedNode": "\\raspberry_pi\\locations.txt",
+  "SelectedNode": "\\ground_control_station\\drone_communication.py",
   "PreviewInSolutionExplorer": false
 }
