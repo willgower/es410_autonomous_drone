@@ -40,8 +40,10 @@ On entry: `Drone is idle. Waiting for command.`
 |  |  |  |
 |  |  |  |
 
+Once the drone receives the mission, it processes it, saving and distributing the necessary parameters. Upon completion, `Mission processing finished.` is returned.
+
 #### State: Wait for battery load
-Battery must be connected in 20 seconds. GCS must confirm battery has been secured in a further 20 s with command `battery secured`.
+Battery must be connected in 20 seconds. When a voltage is present, drone reports `Battery connected.`. GCS must confirm battery has been secured in a further 20 s with command `battery secured`. Drone reports `Battery loaded.`
 
 #### State: Wait for parcel load
 Parcel must be loaded within 30 seconds.
@@ -75,3 +77,9 @@ Authorisation must be received within 30 s
 On entry: `Releasing parcel.`
 
 On completion: `Parcel released.`
+
+## Ground Control Station
+_Using the Ground Control Station (GCS) is a trivial task on the whole because the program prompts the user for particular responses. Where commands must be entered, these are the same as required to send to the drone (detailed in 'Drone' section of the user guide). A few notes are contained below for the developer and which explain certain behaviour of the program._
+
+#### Drone timeouts
+The software currently doesn't handle drone timeout messages. The message will be printed to the command line but the program is then stuck in an infinite loop. This is undesirable behaviour which should be rectified.
