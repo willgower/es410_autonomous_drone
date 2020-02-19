@@ -46,7 +46,7 @@ Once the drone receives the mission, it processes it, saving and distributing th
 Battery must be connected in 20 seconds. When a voltage is present, drone reports `Battery connected.`. GCS must confirm battery has been secured in a further 20 s with command `battery secured`. Drone reports `Battery loaded.`
 
 #### State: Wait for parcel load
-Parcel must be loaded within 30 seconds.
+Parcel loading must be initatied within 30 seconds. Once button is pushed this will start the grippers closing. Grippers are to stop closing according to current sensing. Completion confirmation from drone is `Parcel loaded.`.
 
 #### State: Check drone is armable
 Currently just gets this from pixhawk, unsure if further checks should be done
@@ -54,6 +54,8 @@ Currently just gets this from pixhawk, unsure if further checks should be done
 |---------|-------------|
 |Checks Passed| `Drone ready to arm.` |
 |Checks Failed| `Arming check failed.` |
+
+Currently if the checks are failed, the drone aborts the mission. **This should be changed to allow recheck**.
 
 #### State: Waiting for HWSS
 Switch must be pressed within 30 s
@@ -83,3 +85,6 @@ _Using the Ground Control Station (GCS) is a trivial task on the whole because t
 
 #### Drone timeouts
 The software currently doesn't handle drone timeout messages. The message will be printed to the command line but the program is then stuck in an infinite loop. This is undesirable behaviour which should be rectified.
+
+#### Responding 'n' in GCS
+Typically sends GCS program back to drone idle state but relies on the drone to timeout rather than sending an abort message. Program edited so GCS appropriately handles the waiting.
