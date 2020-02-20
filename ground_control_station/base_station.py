@@ -33,10 +33,19 @@ def get_response(prompt):
 		ans = input(prompt)
 	return ans
 
+def clear():
+	"""
+	clear command line issue command based on os
+	"""
+	if sys.platform == 'win32':
+		os.system('cls')
+	elif sys.platform == 'linux':
+		os.system('clear')
+
 def abort_setup():
 	print("\n Aborting setup. Please wait for drone to timeout and be ready to receive a command. \n")
 	time.sleep(3)
-	os.system("clear")
+	clear()
 
 if __name__ == "__main__":
 	while True:
@@ -132,7 +141,7 @@ if __name__ == "__main__":
 		response = get_response("Is battery secured (y/n): ")
 		if response == 'y':
 			drone.send_message("battery secured")
-			wait_for_msg("Battery Loaded.")
+			wait_for_msg("Battery loaded.")
 			print("Battery load complete. \n")
 		elif response == 'n':
 			abort_setup()
@@ -159,11 +168,11 @@ if __name__ == "__main__":
 		wait_for_msg("Waiting for authorisation to fly.")
 		print("Drone is ready to fly. Awaiting authorisation to begin flight.")
 		print(" **WARNING: when you grant authorisation the drone will take off. Ensure it is safe to begin flight.** ")
-		print("Enter ""takeoff"" to begin the flight or ""cancel"" to abort")
+		print("Enter \"takeoff\" to begin the flight or \"cancel\" to abort")
 		
 		command = input("Command: ")
 		while command not in ('takeoff', 'cancel'):
-			print("Response not recognised, please enter ""takeoff"" or ""cancel""")
+			print("Response not recognised, please enter \"takeoff\" or \"cancel\"")
 			command = input("Command: ")
 		
 		if command == "takeoff":
@@ -185,6 +194,9 @@ if __name__ == "__main__":
 			if not msg == None:
 				print("  " + msg)
 			msg = drone.read_message()
+		print("Flight complete. Drone at home.")
+		clear()
+		# drone will go back to idle state 
 
 	# after while loop, exit program
 	quit()
