@@ -4,7 +4,7 @@
 # Description: File to run locally on a laptop acting as the ground control
 # station.
 
-from drone_communication import DroneComms
+from ground_control_station.drone_communication import DroneComms  # hmm odd behaviour regarding folder name
 import sys
 import os
 import json
@@ -24,11 +24,19 @@ def wait_for_msg(message):
 
 def verify(action):
 	print("Are you sure you want to " + action + "?")
-	ans = input("Response (y/n): ")
+	return get_response("Response (y/n): ")
+	 
+def get_response(prompt):
+	ans = input(prompt)
 	while ans not in ('y', 'n'):
 		print("Response not recognised. Try again.")
-		ans = input("Response (y/n): ")
-	return ans 
+		ans = input(prompt)
+	return ans
+
+def abort_setup():
+	print("\n Aborting setup. Please wait for drone to timeout and be ready to receive a command. \n")
+	time.sleep(3)
+	os.system("clear")
 
 if __name__ == "__main__":
 	while True:
@@ -54,6 +62,8 @@ if __name__ == "__main__":
 
 	while True:
 		# === DRONE STATE: IDLE ===
+		print("Waiting for drone to confirm it is ready for a command...")
+		wait_for_msg("Drone is idle. Waiting for command.")  # this line mainly if user responds no
 		print("Drone idle. Waiting for command.")
 		command = input("Enter command: ")
 		# --- shutdown ---
@@ -69,7 +79,7 @@ if __name__ == "__main__":
 				print("Connection to drone lost. Exiting program.")
 				sys.exit()
 			elif answer == 'n':
-				time.sleep(1)
+				abort_setup()
 				continue # go back to idle state
 			else: # problem
 				print("Problem. This shouldn't have happend. Quitting.")
@@ -88,7 +98,7 @@ if __name__ == "__main__":
 				print("Connection to drone lost. Exiting program.")
 				sys.exit()
 			elif answer == 'n':
-				time.sleep(1)
+				abort_setup()
 				continue # go back to idle state
 			else: # problem
 				print("Problem. This shouldn't have happend. Quitting.")
@@ -120,7 +130,61 @@ if __name__ == "__main__":
 		wait_for_msg("Battery connected.")
 		print("Battery is connected. Please confirm the battery is secured.")
 		response = get_response("Is battery secured (y/n): ")
+		if response == 'y':
+			drone.send_message("battery secured")
+			wait_for_msg("Battery Loaded.")
+			print("Battery load complete. \n")
+		elif response == 'n':
+			abort_setup()
+			continue # go back to idle state
+		else: # problem
+			print("Problem. This shouldn't have happend. Quitting.")
+			sys.exit()
 
+		# === DRONE STATE: PARCEL LOADING ===
+		print("Please hold parcel underneath drone and press button to close the grippers.")
+		wait_for_msg("Parcel loaded.")
+		
+		# === DRONE STATE: CHECK DRONE IS ARMABLE ===
+		print("Checking drone is armable.")
+		wait_for_msg("Drone ready to arm.")
+		print("Drone is ready to arm. \n")
+
+		# === DRONE STATE: WAITING FOR HWSS ===
+		print("Please press the hardware safety switch.")
+		wait_for_msg("Switch pressed.")
+		print("Switch pressed. Pausing to allow all people to withdraw to a safe distance. \n")
+
+		# === DRONE STATE: WAITING FOR FLIGHT AUTHORISATION ===
+		wait_for_msg("Waiting for authorisation to fly.")
+		print("Drone is ready to fly. Awaiting authorisation to begin flight.")
+		print(" **WARNING: when you grant authorisation the drone will take off. Ensure it is safe to begin flight.** ")
+		print("Enter ""takeoff"" to begin the flight or ""cancel"" to abort")
+		
+		command = input("Command: ")
+		while command not in ('takeoff', 'cancel'):
+			print("Response not recognised, please enter ""takeoff"" or ""cancel""")
+			command = input("Command: ")
+		
+		if command == "takeoff":
+			drone.send_message("takeoff")
+			wait_for_msg("Authorisation received.")
+			print("Authorisation received by drone. Beginning flight imminently")
+			# continue with program
+		elif command == "cancel":
+			ababort_setup()
+			continue # go back to idle state
+		else: # problem
+			print("Problem. This shouldn't have happend. Quitting.")
+			sys.exit()
+		
+		# === DRONE STATE: FLYING ===
+		print("Drone is in flight mode. Messages from drone will be reported.")
+		msg = None
+		while msg != "Flight complete. Drone at home.":
+			if not msg == None:
+				print("  " + msg)
+			msg = drone.read_message()
 
 	# after while loop, exit program
 	quit()

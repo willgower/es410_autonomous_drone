@@ -94,7 +94,7 @@ class DroneControl:
 				else - error so abort
 		if mission, then save the mission command as a property
 		"""
-		self.report("Drone is idle. Waiting for command")
+		self.report("Drone is idle. Waiting for command.")
 
 		cmd = -1
 		while cmd == -1:
@@ -180,7 +180,7 @@ class DroneControl:
 		start = time.perf_counter()
 		while time.perf_counter() - start < timeout:
 			if self.uC.is_parcel_loaded(): 
-				self.report("Parcel Loaded.")
+				self.report("Parcel loaded.")
 				break
 		else:
 			self.report("Parcel not loaded within " + timeout + " seconds.")
@@ -231,7 +231,7 @@ class DroneControl:
 		timeout = 30
 		start = time.perf_counter()
 		while time.perf_counter() - start < timeout:
-			if self.gcs.read_message() == "battery secured": 
+			if self.gcs.read_message() == "takeoff": 
 				self.report("Authorisation received.")
 				break
 		else:
@@ -283,6 +283,11 @@ class DroneControl:
 		# land
 		self.state = "Landing"
 		self.fc.land()
+		#
+		# check above land() is blocking
+		#
+
+		drone.report("Drone landed.")
 
 		self.scheduler.stop()
 		self.logger.finish_logging()
