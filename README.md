@@ -68,12 +68,17 @@ Switch must be pressed within 30 s
 Between states (after switch is pressed) a pause of 5 seconds happens to prevent immediate arming of the drone.
 
 #### State: Waiting for flight authorisation
-Authorisation must be received within 30 s
+Authorisation must be received within 30 s. Send `takeoff` to authorise flight.
 | Description | Message sent | 
 |---------|-------------|
 | On state entry | `Waiting for authorisation to fly.`|
 | Authorisation message received | `Authorisation received.`|
 | Timeout | `Authorisation window timed out.`|
+
+#### State: Flying
+Drone reports once a second containing current status.
+
+Drone will fly to destination and report `Drone landed.` once it has landed on the target. The grippers will then release the parcel (see next section). The drone will then upload the return flight and automatically take off. Once drone lands back at base, `Flight complete. Drone at home.` is reported.
 
 #### State: Release parcel
 On entry: `Releasing parcel.`
