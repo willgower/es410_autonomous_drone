@@ -55,6 +55,7 @@ class DroneControl:
 		self.emergency_land = False
 		self.mission_title = ""
 		self.state = None
+		self.scheduler = None
 
 		# dictionary of flight parameters
 		self.parameters = {
@@ -64,8 +65,14 @@ class DroneControl:
 		}
 
 	def friday_test(self):
+		self.scheduler = RecurringTimer(1, self.__monitor_flight)
 		self.logger.prepare_for_logging(str(dt.now()))
-		self.__monitor_flight()
+		self.scheduler.start()
+		for _ in range(10):
+			time.sleep(1)
+			print(".", end="")
+		self.scheduler.stop()
+		self.logger.finish_logging()
 
 	def alert_initialisation_failure(self):
 		"""
@@ -304,7 +311,7 @@ class DroneControl:
 		Get flight data from various places and send them to the data logging module
 		"""
 		# set timer so that it runs recursively
-		self.recTimer.start()
+		self.scheduler.start()
 		
 		if self.gcs.read_message() == "emergency land":
 			while True:
@@ -456,5 +463,3 @@ if __name__ == "__main__":
 
 	drone.friday_test()
 
-	while True:
-		time.sleep(1)
