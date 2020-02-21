@@ -47,8 +47,8 @@ class DataLogging:
                 "Location lat": fc_data_in["Location lat"],
                 "Location alt": fc_data_in["Location alt"],
                 "Velocity": fc_data_in["Location lat"],
-                "Ground Speed": fc_data_in["Ground Speed"],
-                "Airspeed": fc_data_in["Air Speed"],
+                "Ground Speed": fc_data_in["Groundspeed"],
+                "Airspeed": fc_data_in["Airspeed"],
                 "Current": str(current),
                 "Voltage": fc_data_in["Battery"]}
 
