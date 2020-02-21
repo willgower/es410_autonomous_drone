@@ -392,10 +392,6 @@ class DroneControl:
 	def __prepare_exit(self):
 		print("BUTTON HELD! Closing down")
 
-		self.button.close()
-		if self.scheduler.is_running:
-			self.scheduler.stop()
-
 		self.logger.close()
 		self.uC.close()
 		self.fc.close()
