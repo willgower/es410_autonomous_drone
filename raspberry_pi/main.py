@@ -71,6 +71,7 @@ class DroneControl:
 		time.sleep(5)
 		self.scheduler.stop()
 		self.logger.finish_logging()
+		self.__prepare_exit()
 
 	def alert_initialisation_failure(self):
 		"""
