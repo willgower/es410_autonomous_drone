@@ -15,6 +15,7 @@ import json
 import time
 import os
 from datetime import datetime as dt
+from gpiozero import Button
 
 
 class DroneControl:
@@ -50,6 +51,10 @@ class DroneControl:
 		self.logger = DataLogging()
 		self.vision = LandingVision()
 
+		self.button = Button(26)
+		self.button.hold_time = 3
+		self.button.when_held = self.__prepare_exit
+
 		# Setting up class attributes
 		self.abortFlag = None
 		self.emergency_land = False
@@ -59,19 +64,24 @@ class DroneControl:
 
 		# dictionary of flight parameters
 		self.parameters = {
-			"traverse_alt" : 10,
-			"descent_vel" : 0.25
-
+			"traverse_alt": 10,
+			"descent_vel": 0.25
 		}
 
 	def friday_test(self):
 		self.scheduler = RecurringTimer(0.1, self.__monitor_flight)
-		self.logger.prepare_for_logging(str(dt.now()))
-		self.scheduler.start()
-		time.sleep(5)
-		self.scheduler.stop()
-		self.logger.finish_logging()
-		self.__prepare_exit()
+
+		while True:
+			self.logger.prepare_for_logging(str(dt.now()))
+
+			# Wait for the button press to start data logging
+			self.button.wait_for_press()
+			self.scheduler.start()
+			time.sleep(1)  # Add some debounce
+
+			# Wait for the button press to stop data logging
+			self.scheduler.stop()
+			self.logger.finish_logging()
 
 	def alert_initialisation_failure(self):
 		"""
