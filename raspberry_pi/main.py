@@ -79,7 +79,7 @@ class DroneControl:
 			self.button.wait_for_press()
 			print("Logging started")
 			self.scheduler.start()
-			time.sleep(1)  # Add some debounce
+			time.sleep(5)  # Add some debounce
 
 			# Wait for the button press to stop data logging
 			self.button.wait_for_press()
@@ -388,10 +388,15 @@ class DroneControl:
 
 	def __prepare_exit(self):
 		print("BUTTON HELD! Closing down")
+
 		self.logger.close()
 		self.uC.close()
 		self.fc.close()
 		self.gcs.close()
+
+		time.sleep(5)
+		print("Ending script")
+		quit()
 
 
 if False:
