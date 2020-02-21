@@ -43,7 +43,7 @@ class MicroController:
         when called should return latest current reading
         """
         try:
-            read_ser = self.ser.readline().strip().decode('ascii')
+            read_ser = self.ser.readlines()[-1].strip().decode('ascii')
         except:
             read_ser = None
             pass
