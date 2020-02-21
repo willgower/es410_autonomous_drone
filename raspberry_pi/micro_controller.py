@@ -20,8 +20,8 @@ class MicroController:
             self.ser.timeout = 0.1
         except:
             self.initSuccessful = False
-
-        self.initSuccessful = True
+        else:
+            self.initSuccessful = True
 
     def set_mode(self, mode):
         """
