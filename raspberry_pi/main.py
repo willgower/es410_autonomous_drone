@@ -65,12 +65,10 @@ class DroneControl:
 		}
 
 	def friday_test(self):
-		self.scheduler = RecurringTimer(1, self.__monitor_flight)
+		self.scheduler = RecurringTimer(0.1, self.__monitor_flight)
 		self.logger.prepare_for_logging(str(dt.now()))
 		self.scheduler.start()
-		for _ in range(10):
-			time.sleep(1)
-			print(".", end="")
+		time.sleep(5)
 		self.scheduler.stop()
 		self.logger.finish_logging()
 
