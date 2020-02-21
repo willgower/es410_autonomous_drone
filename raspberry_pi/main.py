@@ -397,8 +397,7 @@ class DroneControl:
 
 		print("Ending script")
 
-		quit()
-		sys.exit()
+		os._exit(0)
 
 
 if False:
