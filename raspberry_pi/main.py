@@ -69,8 +69,6 @@ class DroneControl:
 		}
 
 	def friday_test(self):
-		self.scheduler = RecurringTimer(0.1, self.__monitor_flight)
-
 		while True:
 			print("Short press for logging. Long press to end script.")
 
