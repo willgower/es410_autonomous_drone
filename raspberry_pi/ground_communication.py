@@ -23,8 +23,10 @@ class GroundControlStation:
 
     def read_message(self):
         """
-        Read the latest message from the serial buffer and return it
-        Will - is this going to return None if no message read?
+        Read the latest message from the serial buffer and return it without:
+            - whitespace
+            - carriage return
+            - new line
         """
 
     def send_message(self, message):

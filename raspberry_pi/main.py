@@ -14,10 +14,11 @@ import sys
 import json
 import time
 import os
+from datetime import datetime as dt
 
 
 class DroneControl:
-	def __init__(self):
+	def __init__(self, log_only):
 		"""
 		instantiate objects 
 		this process will establish communication links
@@ -25,7 +26,7 @@ class DroneControl:
 		"""
 
 		self.gcs = GroundControlStation()
-		if self.gcs.initSuccessful:
+		if self.gcs.initSuccessful or log_only:
 			self.report("Link to GCS established")
 		else:
 			# if fail to open link to GCS no means of reporting so enter specific sequence
@@ -62,6 +63,10 @@ class DroneControl:
 
 		}
 
+	def friday_test(self):
+		self.logger.prepare_for_logging(str(dt.now()))
+		self.__monitor_flight()
+
 	def alert_initialisation_failure(self):
 		"""
 		in case communication to the ground control station (GCS)
@@ -69,6 +74,7 @@ class DroneControl:
 		"""
 		# Flash some LEDs!
 		# ...for a few seconds then return control to parent function to end program
+		pass
 
 	def report(self, message):
 		"""
@@ -76,6 +82,7 @@ class DroneControl:
 		James - is this even required for literally a direct function call? I'd say unnecessary.
 		"""
 		self.gcs.send_message(message)
+		print(message)
 
 	def abort(self):
 		"""
@@ -310,7 +317,7 @@ class DroneControl:
 		fc_stats = self.fc.get_fc_stats()
 		current = self.uC.get_current()
 
-		self.logger.log_info(current, fc_status)
+		self.logger.log_info(current, fc_stats)
 
 		message = "State: " + self.state + \
 				  "Altitude :" + fc_stats["Location alt"] + \
@@ -364,7 +371,7 @@ class DroneControl:
 		self.gcs.close()
 
 
-if __name__ == "__main__":
+if False:
 	# === INITIALISATION ===
 	# try to initialise drone
 	# if fail then print error and exit program
@@ -375,14 +382,14 @@ if __name__ == "__main__":
 		sys.exit()
 	else:
 		drone.report("Initialisation successful.")
-		
+
 	# if exception raised in initialisation then this will not execute because sys.exit()
 	while True:
 		# === IDLE ===
 		# state: idle
 		drone.abortFlag = False
 		cmd = drone.wait_for_command()
-		
+
 		# === SETTING UP FLIGHT ===
 		if cmd == 0:
 			drone.shutdown()
@@ -408,7 +415,7 @@ if __name__ == "__main__":
 		drone.parcel_load()
 
 		if drone.abortFlag: continue
-		
+
 		# state: performing arming check
 		drone.check_armable()
 
@@ -420,7 +427,7 @@ if __name__ == "__main__":
 		time.sleep(5)
 
 		if drone.abortFlag: continue
-		
+
 		# state: wait for take off authorisation
 		drone.wait_for_flight_authorisation()
 
@@ -437,5 +444,17 @@ if __name__ == "__main__":
 		drone.execute_flight()
 
 		drone.report("Flight complete. Drone at home.")
-	
-	# end while
+
+if __name__ == "__main__":
+	try:
+		drone = DroneControl(True)
+	except ValueError as error:
+		print(error)
+		sys.exit()
+	else:
+		print("Initialisation successful.")
+
+	drone.friday_test()
+
+	while True:
+		time.sleep(1)
