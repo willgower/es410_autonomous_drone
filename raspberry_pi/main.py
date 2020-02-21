@@ -341,12 +341,15 @@ class DroneControl:
 		current = self.uC.get_current()
 
 		self.logger.log_info(current, fc_stats)
+		print(".", end="")
 
+		""" JAMES THIS MESSAGE ISNT WORKING - CAN YOU FIX?
 		message = "State: " + self.state + \
 				  "Altitude :" + fc_stats["Location alt"] + \
 				  "Distance to waypoint :" + fc_stats[""] + \
 				  "Battery Voltage (mV): " + fc_stats["Battery"]
 		self.report(message)
+		"""
 
 	def release_package(self):
 		"""
