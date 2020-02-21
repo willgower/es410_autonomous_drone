@@ -15,7 +15,7 @@ class MicroController:
         Set flag for successful initialisation
         """
 
-        self.ser = serial.Serial("/dev/ttyACM1", 9600)
+        self.ser = serial.Serial("/dev/ttyACM0", 9600)
         self.ser.baudrate = 9600
         self.ser.timeout = 0.1
 
