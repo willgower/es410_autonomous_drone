@@ -80,7 +80,7 @@ class DroneControl:
 
 			self.logger.prepare_for_logging(dt.now().strftime("%H:%M:%S_%d-%B"))
 			print("Logging started")
-			self.scheduler.start()
+			self.__monitor_flight()
 			time.sleep(5)  # Add a minimum logging time
 
 			# Wait for the button press to stop data logging
