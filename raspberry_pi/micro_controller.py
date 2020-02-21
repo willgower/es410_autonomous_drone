@@ -15,7 +15,7 @@ class MicroController:
         Set flag for successful initialisation
         """
 
-        self.ser = serial.Serial("/dev/ttyACM0", 9600)
+        self.ser = serial.Serial("/dev/serial/by-id/usb-Arduino_LLC_Arduino_Nano_Every_C2AD5E5651514743594A2020FF054A1D-if00", 9600)  # /dev/ttyACM0
         self.ser.baudrate = 9600
         self.ser.timeout = 0.1
 
