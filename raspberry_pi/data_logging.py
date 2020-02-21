@@ -3,7 +3,7 @@
 # File: data_logging.py
 # Description: Module to handle the logging of in flight data such as current readings against time.
 
-from datetime import datetime
+from datetime import datetime as dt
 import serial
 import json
 import os
@@ -22,15 +22,17 @@ class DataLogging:
         """
         self.currently_logging = True
         self.data_file = open(self.file_path + name + ".csv", "w+")
-        self.data_file.write("Logging started at " + datetime.now().strftime("%d-%m-%y at %H:%M:%S\n"))
-        self.data_file.write("Longitude, Latitude, Altitude, Velocity, Groundspeed, Airspeed, Current, Voltage\n")
+        self.data_file.write("Logging started at " + dt.now().strftime("%d-%m-%y at %H:%M:%S\n"))
+        self.data_file.write("Timestamp, Longitude, Latitude, Altitude, Velocity, "
+                             "Groundspeed, Airspeed, Current, Voltage\n")
 
-    def log_info(self, current, fc_data_in):
+    def log_info(self, timestamp, current, fc_data_in):
         """
         function should save information to a file in appropriate format
         """
 
-        data = {"Location lon": fc_data_in["Location lon"],
+        data = {"Timestamp": dt.now().strftime("%H:%M:%S.%f"),
+                "Location lon": fc_data_in["Location lon"],
                 "Location lat": fc_data_in["Location lat"],
                 "Location alt": fc_data_in["Location alt"],
                 "Velocity": fc_data_in["Location lat"],
