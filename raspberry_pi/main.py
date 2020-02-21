@@ -82,6 +82,7 @@ class DroneControl:
 			time.sleep(1)  # Add some debounce
 
 			# Wait for the button press to stop data logging
+			self.button.wait_for_press()
 			self.scheduler.stop()
 			print("Logging stopped")
 			self.logger.finish_logging()
