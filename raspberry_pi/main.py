@@ -76,7 +76,7 @@ class DroneControl:
 
 			# Wait for the button press to start data logging
 			self.button.wait_for_press()
-			self.button.wait_for_inactive()  # Only start logging when it is pressed and released
+			self.button.wait_for_release()  # Only start logging when it is pressed and released
 
 			self.logger.prepare_for_logging(dt.now().strftime("%H:%M:%S_%d-%B"))
 			print("Logging started")
