@@ -342,13 +342,11 @@ class DroneControl:
 
 		self.logger.log_info(current, fc_stats)
 
-		"""
 		message = "State: " + self.state + \
 				  "Altitude :" + fc_stats["Location alt"] + \
 				  "Distance to waypoint :" + fc_stats[""] + \
 				  "Battery Voltage (mV): " + fc_stats["Battery"]
 		self.report(message)
-		"""
 
 	def release_package(self):
 		"""
@@ -398,7 +396,9 @@ class DroneControl:
 		self.gcs.close()
 
 		print("Ending script")
+
 		quit()
+		sys.exit()
 
 
 if False:
