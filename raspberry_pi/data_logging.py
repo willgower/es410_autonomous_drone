@@ -29,11 +29,30 @@ class DataLogging:
     def log_info(self, current, fc_data_in):
         """
         function should save information to a file in appropriate format
-        """
-        data = fc_data_in
-        data["current"] = str(current)
 
-        self.data_file.write(','.join(data.values()) + "\n")
+                fc_data = {
+            "Location lon": str(self.vehicle.location.global_frame.lon),
+            "Location lat": str(self.vehicle.location.global_frame.lat),
+            "Location alt": str(self.vehicle.location.global_frame.alt),
+            "Range Finder Height": str(self.vehicle.rangefinder),
+            "Distance to waypoint": str(0),
+            "Velocity": str(self.vehicle.velocity),
+            "Displacement": str(0),
+            "Battery": str(self.vehicle.battery.voltage),
+            "Groundspeed": str(self.vehicle.groundspeed),
+            "Airspeed": str(self.vehicle.airspeed)
+        }
+        """
+        data = {"Location lon": fc_data_in["Location lon"],
+                "Location lat": fc_data_in["Location lat"],
+                "Location alt": fc_data_in["Location alt"],
+                "Velocity": fc_data_in["Location lat"],
+                "Ground Speed": fc_data_in["Ground Speed"],
+                "Airspeed": fc_data_in["Air Speed"],
+                "Current": str(current),
+                "Voltage": fc_data_in["Battery"]}
+
+        self.data_file.write(', '.join(data.values()) + "\n")
         
     def finish_logging(self):
         """
