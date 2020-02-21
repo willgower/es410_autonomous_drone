@@ -15,8 +15,8 @@ class MicroController:
         """
         self.initSuccessful = True
 
-        self.ser = serial.Serial("/dev/ttyUSB0", 115200)
-        self.ser.baudrate = 115200
+        self.ser = serial.Serial("/dev/ttyUSB0", 9600)
+        self.ser.baudrate = 9600
         self.ser.timeout = 0.1
 
     def set_mode(self, mode):
@@ -44,13 +44,12 @@ class MicroController:
         when called should return latest current reading
         """
         try:
-            print(self.ser.readlines())
             self.ser.reset_input_buffer()
+            self.ser.readline()
             read_ser = self.ser.readline().strip().decode('ascii')
         except:
             read_ser = "Failed to get current reading"
             pass
-        print(read_ser)
         return read_ser
 
     def close(self):
