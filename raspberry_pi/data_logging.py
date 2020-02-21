@@ -4,16 +4,14 @@
 # Description: Module to handle the logging of in flight data such as current readings against time.
 
 from datetime import datetime as dt
-import serial
 import json
 import os
-import time
 
 
 class DataLogging:
     def __init__(self):
         self.currently_logging = False
-        self.file_path = os.getcwd() + "/logging/"
+        self.file_path = os.path.dirname(os.path.abspath(__file__)) + "/logging/"
         self.data_file = None
 
     def prepare_for_logging(self, name):
