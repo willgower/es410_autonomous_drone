@@ -74,13 +74,16 @@ class DroneControl:
 		while True:
 			self.logger.prepare_for_logging(str(dt.now()))
 
+			print("Waiting for push button to start logging")
 			# Wait for the button press to start data logging
 			self.button.wait_for_press()
+			print("Logging started")
 			self.scheduler.start()
 			time.sleep(1)  # Add some debounce
 
 			# Wait for the button press to stop data logging
 			self.scheduler.stop()
+			print("Logging stopped")
 			self.logger.finish_logging()
 
 	def alert_initialisation_failure(self):
@@ -383,6 +386,7 @@ class DroneControl:
 		os.system('sudo shutdown -r now')
 
 	def __prepare_exit(self):
+		print("BUTTON HELD! Closing down")
 		self.logger.close()
 		self.uC.close()
 		self.fc.close()
