@@ -26,7 +26,7 @@ class DataLogging:
         self.data_file.write("Timestamp, Longitude, Latitude, Altitude, Velocity, "
                              "Groundspeed, Airspeed, Current, Voltage\n")
 
-    def log_info(self, timestamp, current, fc_data_in):
+    def log_info(self, current, fc_data_in):
         """
         function should save information to a file in appropriate format
         """
