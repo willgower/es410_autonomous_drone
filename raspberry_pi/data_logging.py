@@ -23,26 +23,13 @@ class DataLogging:
         self.currently_logging = True
         self.data_file = open(self.file_path + name + ".csv", "w+")
         self.data_file.write("Logging started at " + datetime.now().strftime("%d-%m-%y at %H:%M:%S\n"))
-        self.data_file.write("Location lon, Location lat, Location alt, Range Finder Height, "
-                             "Distance to waypoint, Velocity, Displacement, Battery, Groundspeed, Airspeed\n")
+        self.data_file.write("Longitude, Latitude, Altitude, Velocity, Groundspeed, Airspeed, Current, Voltage\n")
 
     def log_info(self, current, fc_data_in):
         """
         function should save information to a file in appropriate format
-
-                fc_data = {
-            "Location lon": str(self.vehicle.location.global_frame.lon),
-            "Location lat": str(self.vehicle.location.global_frame.lat),
-            "Location alt": str(self.vehicle.location.global_frame.alt),
-            "Range Finder Height": str(self.vehicle.rangefinder),
-            "Distance to waypoint": str(0),
-            "Velocity": str(self.vehicle.velocity),
-            "Displacement": str(0),
-            "Battery": str(self.vehicle.battery.voltage),
-            "Groundspeed": str(self.vehicle.groundspeed),
-            "Airspeed": str(self.vehicle.airspeed)
-        }
         """
+
         data = {"Location lon": fc_data_in["Location lon"],
                 "Location lat": fc_data_in["Location lat"],
                 "Location alt": fc_data_in["Location alt"],
