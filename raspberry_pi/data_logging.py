@@ -48,7 +48,6 @@ class DataLogging:
         """
         flight finished, close file
         """
-        time.sleep(1)
         self.data_file.close()
         self.currently_logging = False
 

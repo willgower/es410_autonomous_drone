@@ -87,8 +87,8 @@ class DroneControl:
 			# Wait for the button press to stop data logging
 			self.button.wait_for_press()
 			self.scheduler.stop()
-			print("Logging stopped")
 			self.logger.finish_logging()
+			print("Logging stopped")
 
 	def alert_initialisation_failure(self):
 		"""
