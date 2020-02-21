@@ -4,6 +4,7 @@
 # Description: Module to handle serial connection to the Arduino
 
 import serial
+import time
 
 
 class MicroController:
@@ -13,11 +14,15 @@ class MicroController:
         get confirmation from arduino that grippers are open
         Set flag for successful initialisation
         """
-        self.initSuccessful = True
 
         self.ser = serial.Serial("/dev/ttyUSB0", 9600)
         self.ser.baudrate = 9600
         self.ser.timeout = 0.1
+
+        while not self.ser.is_open:
+            time.sleep(1)
+
+        self.initSuccessful = True
 
     def set_mode(self, mode):
         """
@@ -49,7 +54,7 @@ class MicroController:
             read_ser = self.ser.readline().strip().decode('ascii')
         except:
             read_ser = "Failed to get current reading"
-            pass
+
         return read_ser
 
     def close(self):
