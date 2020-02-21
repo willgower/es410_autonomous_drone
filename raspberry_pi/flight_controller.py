@@ -39,7 +39,7 @@ class FlightController:
         self.vehicle.mode = 'AUTO'  # Set the default vehicle mode
 
         self.locations = {}
-        with open(os.path.dirname(os.path.abspath(__file__)) + 'locations.txt', 'r') as file:
+        with open(os.path.dirname(os.path.abspath(__file__)) + '/locations.txt', 'r') as file:
             for line in file.readlines():
                 name = line[:line.find(":")].strip()
                 lat = line[line.find(":") + 2:line.find(",")].strip()
