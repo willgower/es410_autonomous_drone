@@ -47,7 +47,7 @@ class MicroController:
             self.ser.reset_input_buffer()
             read_ser = self.ser.readline().strip().decode('ascii')
         except:
-            read_ser = None
+            read_ser = "Failed to get current reading"
             pass
         return read_ser
 
