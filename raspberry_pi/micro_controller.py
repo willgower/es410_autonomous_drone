@@ -44,11 +44,13 @@ class MicroController:
         when called should return latest current reading
         """
         try:
+            print(self.ser.readlines())
             self.ser.reset_input_buffer()
             read_ser = self.ser.readline().strip().decode('ascii')
         except:
             read_ser = "Failed to get current reading"
             pass
+        print(read_ser)
         return read_ser
 
     def close(self):
