@@ -77,7 +77,7 @@ class DroneControl:
 			self.button.wait_for_release()  # Only start logging when it is pressed and released
 
 			# Set up and start logging
-			self.logger.prepare_for_logging(dt.now().strftime("%H:%M:%S_%d-%B"))
+			self.logger.prepare_for_logging(dt.now().strftime("%H:%M:%S-%d_%b"))
 			print("Logging started")
 			self.scheduler = RecurringTimer(0.1, self.__monitor_flight)
 
