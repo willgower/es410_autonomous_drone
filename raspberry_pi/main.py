@@ -72,11 +72,13 @@ class DroneControl:
 		self.scheduler = RecurringTimer(0.1, self.__monitor_flight)
 
 		while True:
-			self.logger.prepare_for_logging(dt.now().strftime("%H:%M:%S_%d-%B"))
-
 			print("Waiting for push button to start logging")
+
 			# Wait for the button press to start data logging
 			self.button.wait_for_press()
+			self.button.wait_for_inactive()  # Only start logging when it is pressed and released
+
+			self.logger.prepare_for_logging(dt.now().strftime("%H:%M:%S_%d-%B"))
 			print("Logging started")
 			self.scheduler.start()
 			time.sleep(5)  # Add some debounce
