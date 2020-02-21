@@ -76,12 +76,15 @@ class DroneControl:
 
 			# Wait for the button press to start data logging
 			self.button.wait_for_press()
-			# self.button.wait_for_release()  # Only start logging when it is pressed and released
+			self.button.wait_for_release()  # Only start logging when it is pressed and released
 
+			# Set up and start logging
 			self.logger.prepare_for_logging(dt.now().strftime("%H:%M:%S_%d-%B"))
 			print("Logging started")
-			self.__monitor_flight()
-			time.sleep(5)  # Add a minimum logging time
+			self.scheduler = RecurringTimer(0.1, self.__monitor_flight)
+
+			# Add a minimum logging time
+			time.sleep(5)
 
 			# Wait for the button press to stop data logging
 			self.button.wait_for_press()
@@ -326,7 +329,7 @@ class DroneControl:
 		Get flight data from various places and send them to the data logging module
 		"""
 		# set timer so that it runs recursively
-		self.scheduler.start()
+		# self.scheduler.start()
 		
 		if self.gcs.read_message() == "emergency land":
 			while True:
