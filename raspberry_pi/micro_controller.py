@@ -17,6 +17,7 @@ class MicroController:
 
         self.ser = serial.Serial("/dev/ttyUSB0", 115200)
         self.ser.baudrate = 115200
+        self.ser.timeout = 0.1
 
     def set_mode(self, mode):
         """
@@ -43,7 +44,8 @@ class MicroController:
         when called should return latest current reading
         """
         try:
-            read_ser = self.ser.readlines()[-1].strip().decode('ascii')
+            self.ser.reset_input_buffer()
+            read_ser = self.ser.readline().strip().decode('ascii')
         except:
             read_ser = None
             pass
