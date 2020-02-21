@@ -25,11 +25,11 @@ class DataLogging:
         self.data_file.write("Logging started at " + datetime.now().strftime("%d-%m-%y at %H:%M:%S\n"))
         self.data_file.write("Current, Location, Speed, Voltage\n")
 
-    def log_info(self, current, fc_status):
+    def log_info(self, current, fc_data):
         """
         function should save information to a file in appropriate format
         """
-        data = json.loads(fc_status)
+        data = fc_data
         data["current"] = str(current)
 
         self.data_file.write(','.join(data.values()) + "\n")
