@@ -14,13 +14,12 @@ class MicroController:
         get confirmation from arduino that grippers are open
         Set flag for successful initialisation
         """
-        self.initSuccessful = False  # Assume connection fails
-        self.ser = serial.Serial("/dev/serial/by-id/usb-Arduino_LLC_Arduino_Nano_Every_C2AD5E5651514743594A2020FF054A1D-if00", 9600)  # /dev/ttyACM0
-        self.ser.baudrate = 9600
-        self.ser.timeout = 0.1
-
-        while not self.ser.is_open:
-            time.sleep(1)
+        try:
+            self.ser = serial.Serial("/dev/serial/by-id/usb-Arduino_LLC_Arduino_Nano_Every_C2AD5E5651514743594A2020FF054A1D-if00", 9600)  # /dev/ttyACM0
+            self.ser.baudrate = 9600
+            self.ser.timeout = 0.1
+        except:
+            self.initSuccessful = False
 
         self.initSuccessful = True
 
