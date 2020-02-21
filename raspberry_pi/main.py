@@ -86,6 +86,7 @@ class DroneControl:
 
 			# Wait for the button press to stop data logging
 			self.button.wait_for_press()
+			self.button.wait_for_release()
 			self.scheduler.stop()
 			self.logger.finish_logging()
 			print("Logging stopped")
