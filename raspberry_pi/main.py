@@ -28,14 +28,8 @@ class DroneControl:
 		self.green_led = PWMLED(22)
 		self.blue_led = LED(27)
 		self.red_led = LED(17)
-		self.yellow_led = LED(4)
 
-		self.green_led.pulse(fade_in_time=0.5, fade_out_time=0.5)
-		self.blue_led.blink()
-		self.red_led.blink()
-		self.yellow_led.blink()
-
-		time.sleep(10)
+		self.green_led.pulse(fade_in_time=0.5, fade_out_time=0.5)  # Pulse the green LED constantly while script is running
 
 		self.gcs = GroundControlStation()
 		if self.gcs.initSuccessful or log_only:
@@ -110,14 +104,11 @@ class DroneControl:
 		in case communication to the ground control station (GCS)
 		was not established, drone should have other means of reporting initialisation failure
 		"""
-		# Flash some LEDs!
-		# ...for a few seconds then return control to parent function to end program
-		pass
+		self.red_led.blink(on_time=0.1, off_time=0.1)
 
 	def report(self, message):
 		"""
 		method to directly report a message to GCS
-		James - is this even required for literally a direct function call? I'd say unnecessary.
 		"""
 		self.gcs.send_message(message)
 		print(message)
@@ -418,11 +409,10 @@ class DroneControl:
 		self.fc.close()
 		self.gcs.close()
 
-		# self.green_led.close()
-		# self.blue_led.close()
-		# self.red_led.close()
-		# self.yellow_led.close()
-		# self.button.close()
+		self.green_led.close()
+		self.blue_led.close()
+		self.red_led.close()
+		self.button.close()
 
 		print("Ending script")
 
