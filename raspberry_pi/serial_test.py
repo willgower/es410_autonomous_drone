@@ -1,9 +1,10 @@
 import serial
+import sys
 
 ser = serial.Serial('/dev/ttyS0', 9600)
 
 while True:
-    x = input()
+    x = sys.stdin.readline().strip()
     if len(x) > 0:
         ser.write((x + "\n").encode('utf-8'))
 
