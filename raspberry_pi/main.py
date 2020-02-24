@@ -61,6 +61,7 @@ class DroneControl:
 		self.mission_title = ""
 		self.state = None
 		self.scheduler = None
+		self.received_mission = None
 
 		# dictionary of flight parameters
 		self.parameters = {
@@ -138,14 +139,14 @@ class DroneControl:
 				cmd = 2
 			elif msg == "mission":
 				# mission command recieved, waiting for mission details.
-				missionMessage = None
+				mission_message = None
 				start = time.perf_counter()
 
 				# timeout after 5 sec
 				while time.perf_counter() - start < 5:
-					missionMessage = self.gcs.read_message()
-					if missionMessage != None: 
-						self.recvdMission = json.loads(missionMessage)
+					mission_message = self.gcs.read_message()
+					if mission_message not None:
+						self.received_mission = json.loads(mission_message)
 						cmd = 1
 						break
 				else:
@@ -214,7 +215,7 @@ class DroneControl:
 				self.report("Parcel loaded.")
 				break
 		else:
-			self.report("Parcel not loaded within " + timeout + " seconds.")
+			self.report("Parcel not loaded within " + str(timeout) + " seconds.")
 			self.abort()
 
 	def check_armable(self):
@@ -227,13 +228,13 @@ class DroneControl:
 		# verify battery and package load?
 		# verify mission uploaded?
 
-		if not self.fc.get_armable_status():
+		if not self.fc.get_armmable_status():
 			self.report("Arming check failed.")
 			self.abort()
 		else:
 			self.report("Drone ready to arm.")
 
-	def wait_for_safety_switch(self):
+	def wait_for_safety_switch(self):  # DEPRECATED - HWSS is completely isolated from software
 		"""
 		loop to until hardware safety switch is pressed
 		timeout after 30 s
