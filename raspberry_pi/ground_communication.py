@@ -3,7 +3,6 @@
 # File: ground_communication.py
 # Description: Module to handle serial communication to the ground control station
 
-from gpiozero import LED
 import serial
 
 
@@ -13,11 +12,13 @@ class GroundControlStation:
         Start wireless serial connection to the GCS using the NRF24L01 modules.
         Timeout - 10s
         """
-        
-        self.initSuccessful = True
 
-        self.yellow_led = LED(4)
-        # Start serial connection here as soon as module is instantiated
+        self.ser = serial.Serial('/dev/ttyS0', 9600, timeout=0)
+
+        if self.ser.is_open:
+            self.initSuccessful = True
+        else:
+            self.initSuccessful = False
 
     def read_message(self):
         """
@@ -26,16 +27,18 @@ class GroundControlStation:
             - carriage return
             - new line
         """
+        return self.ser.readline().decode().strip()
 
     def send_message(self, message):
         """
         Send the message back to the GCS
         """
-        self.yellow_led.blink(on_time=0.05, off_time=0.05, n=20)  # Flash quick for 1 second when sending a message
+        self.ser.write(message.encode('utf-8'))
 
     def close(self):
         """
         prepare for system shutdown
         stop processes, close communications and shutdown hardware where possible
         """
+        self.ser.close()
 
