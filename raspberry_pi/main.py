@@ -114,6 +114,7 @@ class DroneControl:
 		"""
 		method to directly report a message to GCS
 		"""
+		self.yellow_led.blink(on_time=0.05, off_time=0.05, n=20)  # Flash quick for 1 second when sending a message
 		self.gcs.send_message(message)
 		print(message)
 
