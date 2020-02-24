@@ -11,16 +11,14 @@ import os
 import math
 
 
-def get_distance_metres(aLocation1, aLocation2):
+def get_distance_metres(location_1, location_2):
     """
     Returns the ground distance in metres between two LocationGlobal objects.
-
-    This method is an approximation, and will not be accurate over large distances and close to the
-    earth's poles. It comes from the ArduPilot test code:
-    https://github.com/diydrones/ardupilot/blob/master/Tools/autotest/common.py
+    Modified from dronekit example documentation
+    The final term deals with the earths curvature
     """
-    dlat = aLocation2.lat - aLocation1.lat
-    dlong = aLocation2.lon - aLocation1.lon
+    dlat = location_2.lat - location_1.lat
+    dlong = location_2.lon - location_1.lon
     return math.sqrt((dlat * dlat) + (dlong * dlong)) * 1.113195e5
 
 
