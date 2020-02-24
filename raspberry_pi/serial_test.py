@@ -1,17 +1,5 @@
-import time
-import serial
+import wiringpi
 
-wireless = serial.Serial(port='/dev/ttyAMA0', baudrate=9600)
-
-counter = 0
-
-while True:
-    wireless.write("Does this work?".encode('utf-8'))
-    print("sent")
-
-    r = wireless.read(100)
-
-    if r:
-        print(r)
-
-    time.sleep(1)
+wiringpi.wiringPiSetup()
+serial = wiringpi.serialOpen('/dev/ttyAMA0', 9600)
+wiringpi.serialPuts(serial, 'hello world!')
