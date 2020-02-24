@@ -10,8 +10,7 @@ import time
 class MicroController:
     def __init__(self):
         """
-        establish communication to arduino (timeout = 5 s)
-        get confirmation from arduino that grippers are open
+        establish communication to arduino
         Set flag for successful initialisation
         """
         try:
