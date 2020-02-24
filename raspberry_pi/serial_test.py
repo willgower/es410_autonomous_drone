@@ -1,9 +1,13 @@
 import serial
-import time
 
-wireless = serial.Serial('/dev/ttyS0', 9600)
+ser = serial.Serial('/dev/ttyS0', 9600)
 
 while True:
-    wireless.write("hello world!\n".encode('utf-8'))
-    print("sent")
-    time.sleep(1)
+    x = input()
+    if len(x) > 0:
+        ser.write((x + "\n").encode('utf-8'))
+
+    received_data = ser.read()  # read serial port
+    data_left = ser.inWaiting()
+    received_data += ser.read(data_left)
+    print(received_data)  # print received data
