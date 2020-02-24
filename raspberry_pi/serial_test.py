@@ -7,7 +7,5 @@ while True:
     if len(x) > 0:
         ser.write((x + "\n").encode('utf-8'))
 
-    received_data = ser.read()  # read serial port
-    data_left = ser.inWaiting()
-    received_data += ser.read(data_left)
+    received_data = ser.readline()  # read serial port
     print(received_data)  # print received data
