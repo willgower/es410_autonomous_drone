@@ -11,7 +11,6 @@ import os
 class DataLogging:
     def __init__(self):
         self.currently_logging = False
-        self.file_path = os.path.dirname(os.path.abspath(__file__)) + "/logging/"
         self.data_file = None
 
     def prepare_for_logging(self, name):
@@ -20,7 +19,13 @@ class DataLogging:
         write a header
         """
         self.currently_logging = True
-        self.data_file = open(self.file_path + name + ".csv", "w+")
+
+        try:  # Memory stick first
+            os.system("sudo mount /dev/disk/by-uuid/0177-74FD /media/usb_logger")
+            self.data_file = open("/media/usb_logger/" + name + ".csv", "w+")
+        except:  # Try locally on the Pi
+            self.data_file = open(os.path.dirname(os.path.abspath(__file__)) + "/logging/" + name + ".csv", "w+")
+
         self.data_file.write("Logging started at " + dt.now().strftime("%d-%m-%y at %H:%M:%S\n"))
         self.data_file.write("Timestamp, Longitude, Latitude, Altitude, Velocity, "
                              "Groundspeed, Airspeed, Current, Voltage\n")
@@ -47,6 +52,10 @@ class DataLogging:
         flight finished, close file
         """
         self.data_file.close()
+        try:
+            os.system("sudo umount /media/usb_logger")
+        except:
+            pass
         self.currently_logging = False
 
     def close(self):
