@@ -25,11 +25,11 @@ class DroneControl:
 		this process will establish communication links
 		if fail then raise an exception that will terminate the program
 		"""
-		self.green_led = LED(22)
+		self.green_led = PWMLED(22)
 		self.blue_led = LED(27)
 		self.red_led = LED(17)
 
-		self.green_led.blink(n=2, background=False)
+		self.green_led.pulse()
 		self.blue_led.blink(n=2, background=False)
 		self.red_led.blink(n=2, background=False)
 
