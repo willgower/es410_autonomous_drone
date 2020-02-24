@@ -25,13 +25,17 @@ class DroneControl:
 		this process will establish communication links
 		if fail then raise an exception that will terminate the program
 		"""
-		self.green_led = PWMLED(22, active_high=False)
+		self.green_led = PWMLED(22)
 		self.blue_led = LED(27)
 		self.red_led = LED(17)
+		self.yellow_led = LED(4)
 
-		self.green_led.pulse()
-		self.blue_led.blink(n=2, background=False)
-		self.red_led.blink(n=2, background=False)
+		self.green_led.pulse(fade_in_time=0.5, fade_out_time=0.5)
+		self.blue_led.blink()
+		self.red_led.blink()
+		self.yellow_led.blink()
+
+		time.sleep(10)
 
 		self.gcs = GroundControlStation()
 		if self.gcs.initSuccessful or log_only:
@@ -87,6 +91,7 @@ class DroneControl:
 			# Set up and start logging
 			self.logger.prepare_for_logging(dt.now().strftime("%H:%M:%S-%d_%b"))
 			print("Logging started")
+			self.blue_led.blink(on_time=0.3, off_time=0.7)
 			self.scheduler = RecurringTimer(0.1, self.__monitor_flight)
 
 			# Add a minimum logging time
@@ -98,6 +103,7 @@ class DroneControl:
 			self.scheduler.stop()
 			self.logger.finish_logging()
 			print("Logging stopped")
+			self.blue_led.off()
 
 	def alert_initialisation_failure(self):
 		"""
@@ -123,6 +129,7 @@ class DroneControl:
 		self.report("Aborting mission...")
 		self.abortFlag = True
 		self.report("Mission abort successful.")
+		self.red_led.blink(on_time=0.1, off_time=0.1, n=20)
 
 	def wait_for_command(self):
 		"""
