@@ -13,7 +13,7 @@ class GroundControlStation:
         Timeout - 10s
         """
 
-        self.ser = serial.Serial('/dev/ttyS0', 9600, timeout=0)
+        self.ser = serial.Serial('/dev/ttyS0', 9600, timeout=0.1)
 
         if self.ser.is_open:
             self.initSuccessful = True
