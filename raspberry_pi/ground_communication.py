@@ -27,12 +27,14 @@ class GroundControlStation:
             - carriage return
             - new line
         """
-        msg = self.ser.readline().decode().strip()
+        message_length = self.ser.in_waiting
 
-        if msg == "":
-            return None
+        if message_length > 0:
+            message = self.ser.read(message_length).decode().strip()
         else:
-            return msg
+            message = None
+
+        return message
 
     def send_message(self, message):
         """
