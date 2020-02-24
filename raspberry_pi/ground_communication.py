@@ -42,3 +42,14 @@ class GroundControlStation:
         """
         self.ser.close()
 
+
+if __name__ == "__main__":
+    gcs = GroundControlStation()
+
+    while True:
+        received = gcs.read_message()
+
+        if received is not None:
+            print("Received: " + received)
+            gcs.send_message(received + " --- RESPONSE!")
+            print("Sent reply")
