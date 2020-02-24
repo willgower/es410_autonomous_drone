@@ -1,10 +1,9 @@
-import wiringpi
+import serial
 import time
 
-wiringpi.wiringPiSetup()
-serial = wiringpi.serialOpen('/dev/ttyS0', 9600)
+wireless = serial.Serial('/dev/ttyS0', 9600)
 
 while True:
-    wiringpi.serialPuts(serial, 'hello world!')
+    wireless.write('hello world!\n')
     print("sent")
     time.sleep(1)
