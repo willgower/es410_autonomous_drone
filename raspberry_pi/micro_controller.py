@@ -31,17 +31,28 @@ class MicroController:
                 2 - enable parcel load (grippers closing)
                 3 - open grippers
         """
+        self.ser.write("mode" + str(mode))
 
     def is_parcel_loaded(self):
         """
         non-blocking function to return true or false
         """
+        if self.ser.readline() == "complete":
+            self.ser.write("received")
+            return True
+        else:
+            return False
 
     def open_grippers(self):
         """
         first, set mode to 3
         then read serial port in a loop until message that grippers are open
         """
+        self.set_mode(3)
+        while self.ser.readline() != "complete":
+            time.sleep(0.1)
+            self.ser.reset_input_buffer()
+        self.ser.write("received")
 
     def get_current(self):
         """
@@ -61,3 +72,5 @@ class MicroController:
         prepare for system shutdown
         stop processes, close communications and shutdown hardware where possible
         """
+        self.ser.flush()
+        self.ser.close()
