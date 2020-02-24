@@ -8,6 +8,6 @@ while True:
     if len(x) > 0:
         ser.write((x + "\n").encode('utf-8'))
 
-    received_data = ser.read(100).decode()
+    received_data = ser.readline().decode()
     if len(received_data) > 0:
         print(received_data)
