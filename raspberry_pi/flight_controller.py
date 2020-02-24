@@ -8,6 +8,20 @@ from pymavlink import mavutil
 import socket
 import time
 import os
+import math
+
+
+def get_distance_metres(aLocation1, aLocation2):
+    """
+    Returns the ground distance in metres between two LocationGlobal objects.
+
+    This method is an approximation, and will not be accurate over large distances and close to the
+    earth's poles. It comes from the ArduPilot test code:
+    https://github.com/diydrones/ardupilot/blob/master/Tools/autotest/common.py
+    """
+    dlat = aLocation2.lat - aLocation1.lat
+    dlong = aLocation2.lon - aLocation1.lon
+    return math.sqrt((dlat * dlat) + (dlong * dlong)) * 1.113195e5
 
 
 class FlightController:
@@ -36,7 +50,7 @@ class FlightController:
         else:
             self.initSuccessful = True
 
-        self.vehicle.mode = 'AUTO'  # Set the default vehicle mode
+        self.vehicle.mode = 'GUIDED'  # Set the default vehicle mode
 
         self.locations = {}
         with open(os.path.dirname(os.path.abspath(__file__)) + '/locations.txt', 'r') as file:
@@ -49,13 +63,15 @@ class FlightController:
         self.mission_lat = None
         self.mission_lon = None
 
+        self.mission_height = 10  # Height that the drone will fly to and traverse at
+
     def set_destination(self, location):
         """
         Takes in a string of a location from a predefined list.
         E.g. "bluebell", "claycroft", "test_point_A", "test_point_B"
         """
-        self.mission_lon = self.locations[location][0]
-        self.mission_lat = self.locations[location][1]
+        self.mission_lat = self.locations[location][0]
+        self.mission_lon = self.locations[location][1]
 
     def land(self):
         """
@@ -65,21 +81,19 @@ class FlightController:
 
     def is_drone_at_destination(self):
         """
-        added by JRB
         please return true or false
         this is to allow drone to go into guided state
         """
-
-    def set_battery_capacity(self, mah):
-        """
-        Set the size of the battery capacity in mAh.
-        """
+        if self.get_distance_left() < 5:  # Ensure the drone is within 5 metres of target location
+            return True
+        else:
+            return False
 
     def is_battery_connected(self):
         """
         Returns true or false if the battery is connected
         """
-        if self.vehicle.battery[0] is not None:  # This might not work - needs testing!
+        if 10 < self.vehicle.battery[0] < 20:  # When no battery the battery voltage comes out to be around 0.7V
             return True
         else:
             return False
@@ -95,8 +109,8 @@ class FlightController:
             - Airspeed
         """
         fc_data = {
-            "Location lon": str(self.vehicle.location.global_frame.lon),
             "Location lat": str(self.vehicle.location.global_frame.lat),
+            "Location lon": str(self.vehicle.location.global_frame.lon),
             "Location alt": str(self.vehicle.location.global_frame.alt),
             "Range Finder Height": str(self.vehicle.rangefinder),
             "Distance to waypoint": str(0),
@@ -111,12 +125,6 @@ class FlightController:
 
         return fc_data
 
-    def get_hwss_status(self):
-        """
-        Get the status of the hardware safety switch.
-        Return true if pressed
-        """
-
     def get_armmable_status(self):
         """
         Return whether or not the drone is armable.
@@ -127,22 +135,22 @@ class FlightController:
         """
         Run the take off and mission starting commands.
         """
-        # Copter should arm in GUIDED mode
+        # Drone should arm in GUIDED mode
         self.vehicle.mode = "GUIDED"
         self.vehicle.armed = True
 
         while not self.vehicle.armed:
             time.sleep(1)
 
-        self.vehicle.simple_takeoff(10)  # Take off to 9m
+        self.vehicle.simple_takeoff(self.mission_height)
 
     def fly_to_location(self):
         """
         Start the traversing stage of flight
         """
-        location = dronekit.LocationGlobalRelative(self.mission_lat,  # Mission latitude
-                                                   self.mission_lon,  # Mission longitude
-                                                   10                 # Mission altitude
+        location = dronekit.LocationGlobalRelative(self.mission_lat,    # Mission latitude
+                                                   self.mission_lon,    # Mission longitude
+                                                   self.mission_height  # Mission altitude
                                                    )
         self.vehicle.simple_goto(location)
 
@@ -150,6 +158,12 @@ class FlightController:
         """
         Return the horizontal distance to the next waypoint
         """
+        lat = self.mission_lat
+        lon = self.mission_lon
+        alt = self.mission_height
+        mission_location = dronekit.LocationGlobalRelative(lat, lon, alt)
+
+        return get_distance_metres(self.vehicle.location.global_frame, mission_location)
 
     def get_altitude(self):
         """
