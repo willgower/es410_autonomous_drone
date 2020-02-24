@@ -411,6 +411,11 @@ class DroneControl:
 		self.fc.close()
 		self.gcs.close()
 
+		self.green_led.close()
+		self.blue_led.close()
+		self.red_led.close()
+		self.button.close()
+
 		print("Ending script")
 
 		os._exit(0)
