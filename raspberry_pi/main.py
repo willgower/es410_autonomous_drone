@@ -29,9 +29,9 @@ class DroneControl:
 		self.blue_led = LED(27)
 		self.red_led = LED(17)
 
-		self.green_led.blink(n=2)
-		self.blue_led.blink(n=2)
-		self.red_led.blink(n=2)
+		self.green_led.blink(n=2, background=False)
+		self.blue_led.blink(n=2, background=False)
+		self.red_led.blink(n=2, background=False)
 
 		self.gcs = GroundControlStation()
 		if self.gcs.initSuccessful or log_only:
