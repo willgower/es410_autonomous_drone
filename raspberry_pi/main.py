@@ -15,7 +15,7 @@ import json
 import time
 import os
 from datetime import datetime as dt
-from gpiozero import Button
+from gpiozero import Button, LED, PWMLED
 
 
 class DroneControl:
@@ -25,6 +25,13 @@ class DroneControl:
 		this process will establish communication links
 		if fail then raise an exception that will terminate the program
 		"""
+		self.green_led = LED(22)
+		self.blue_led = LED(27)
+		self.red_led = LED(17)
+
+		self.green_led.blink(n=2)
+		self.blue_led.blink(n=2)
+		self.red_led.blink(n=2)
 
 		self.gcs = GroundControlStation()
 		if self.gcs.initSuccessful or log_only:
