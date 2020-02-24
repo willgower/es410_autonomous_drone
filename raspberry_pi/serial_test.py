@@ -1,7 +1,7 @@
 import serial
 import sys
 
-ser = serial.Serial('/dev/ttyS0', 9600)
+ser = serial.Serial('/dev/ttyS0', 9600, timeout=0)
 
 while True:
     x = sys.stdin.readline().strip()
