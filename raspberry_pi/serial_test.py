@@ -9,6 +9,6 @@ while True:
         ser.write((x + "\n").encode('utf-8'))
 
     message_length = ser.in_waiting
-    if len(message_length) > 0:
+    if message_length > 0:
         message = ser.read(message_length).decode()
         print(message)
