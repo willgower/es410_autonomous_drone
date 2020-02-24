@@ -30,7 +30,7 @@ class GroundControlStation:
         message_length = self.ser.in_waiting
 
         if message_length > 0:
-            message = self.ser.read(message_length).decode().strip()
+            message = self.ser.readline().decode().strip()
         else:
             message = None
 
@@ -40,7 +40,7 @@ class GroundControlStation:
         """
         Send the message back to the GCS
         """
-        self.ser.write(message.encode('utf-8'))
+        self.ser.write((message + "\n").encode('utf-8'))
 
     def close(self):
         """
