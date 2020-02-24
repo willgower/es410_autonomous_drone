@@ -3,14 +3,11 @@
 # File: ground_communication.py
 # Description: Module to handle serial communication to the ground control station
 
-# =============== NOTES ===============
-# → skeleton completed by JRB so DroneControl can be written
-#
-# =====================================
+from gpiozero import LED
+import serial
 
 
 class GroundControlStation:
-
     def __init__(self):
         """
         Start wireless serial connection to the GCS using the NRF24L01 modules.
@@ -18,7 +15,8 @@ class GroundControlStation:
         """
         
         self.initSuccessful = True
-        
+
+        self.yellow_led = LED(4)
         # Start serial connection here as soon as module is instantiated
 
     def read_message(self):
@@ -33,6 +31,7 @@ class GroundControlStation:
         """
         Send the message back to the GCS
         """
+        self.yellow_led.blink(on_time=0.05, off_time=0.05, n=20)  # Flash quick for 1 second when sending a message
 
     def close(self):
         """
