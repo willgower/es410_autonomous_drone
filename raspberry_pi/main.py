@@ -139,13 +139,12 @@ class DroneControl:
 				cmd = 2
 			elif msg == "mission":
 				# mission command recieved, waiting for mission details.
-				mission_message = None
 				start = time.perf_counter()
 
 				# timeout after 5 sec
 				while time.perf_counter() - start < 5:
 					mission_message = self.gcs.read_message()
-					if mission_message not None:
+					if mission_message is not None:
 						self.received_mission = json.loads(mission_message)
 						cmd = 1
 						break
@@ -224,7 +223,7 @@ class DroneControl:
 		note, hardware safety switch is pressed after this
 		"""
 
-		### What other checks should be done?
+		# What other checks should be done?
 		# verify battery and package load?
 		# verify mission uploaded?
 
@@ -234,11 +233,16 @@ class DroneControl:
 		else:
 			self.report("Drone ready to arm.")
 
-	def wait_for_safety_switch(self):  # DEPRECATED - HWSS is completely isolated from software
-		"""
+	"""
+	FUNCTION DEPRECATED
+	HWSS is completely isolated from software
+	James pleaase confirm then delete
+	
+	def wait_for_safety_switch(self):
+		\"""
 		loop to until hardware safety switch is pressed
 		timeout after 30 s
-		"""
+		\"""
 		self.report("Waiting for hardware safety switch to be pressed.")
 		
 		# wait for hardware safety switch to be pressed - timeout 30 s
@@ -251,6 +255,7 @@ class DroneControl:
 		else:
 			self.report("Switch press timed out.")
 			self.abort()
+	"""
 
 	def wait_for_flight_authorisation(self):
 		"""
@@ -302,15 +307,15 @@ class DroneControl:
 		# descend 
 		self.fc.change_flight_mode("AUTO")
 		self.state = "Descending"
-		alt = self.fc.get_altitude
+		alt = self.fc.get_altitude()
 		while alt > 2:
 			# use vision system for guidance
 			x_vel, y_vel, yaw_vel = self.vision.get_instruction(alt)
 			z_vel = self.parameters["descent_vel"]
-			self.fc.move_relative(x_vel, y_vel, z_vel)
+			self.fc.move_relative(x_vel, y_vel, z_vel, 0)
 			# so drone not at angle when picture taken
 			time.sleep(1)
-			alt = self.fc.get_altitude
+			alt = self.fc.get_altitude()
 
 		# land
 		self.state = "Landing"
@@ -346,9 +351,9 @@ class DroneControl:
 
 		""" JAMES THIS MESSAGE ISNT WORKING - CAN YOU FIX?
 		message = "State: " + self.state + \
-				  "Altitude :" + fc_stats["Location alt"] + \
-				  "Distance to waypoint :" + fc_stats[""] + \
-				  "Battery Voltage (mV): " + fc_stats["Battery"]
+				"Altitude :" + fc_stats["Location alt"] + \
+				"Distance to waypoint :" + fc_stats[""] + \
+				"Battery Voltage (mV): " + fc_stats["Battery"]
 		self.report(message)
 		"""
 
@@ -357,7 +362,7 @@ class DroneControl:
 		open the grippers to release the package
 		"""
 		self.report("Releasing parcel.")
-		self.uC.open_grippers() # blocking function
+		self.uC.open_grippers()  # blocking function
 		self.report("Parcel released.")
 
 	def upload_return_mission(self):
@@ -404,7 +409,8 @@ class DroneControl:
 		os._exit(0)
 
 
-if False:
+"""
+if __name__ == "__main__":
 	# === INITIALISATION ===
 	# try to initialise drone
 	# if fail then print error and exit program
@@ -477,6 +483,7 @@ if False:
 		drone.execute_flight()
 
 		drone.report("Flight complete. Drone at home.")
+"""
 
 if __name__ == "__main__":
 	try:
@@ -488,4 +495,3 @@ if __name__ == "__main__":
 		print("Initialisation successful.")
 
 	drone.friday_test()
-
