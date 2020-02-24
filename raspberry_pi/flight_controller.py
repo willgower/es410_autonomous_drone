@@ -146,6 +146,7 @@ class FlightController:
         """
         Start the traversing stage of flight
         """
+        # Using relative means the altitude is relative to the drone's home altitude rather than mean sea level
         location = dronekit.LocationGlobalRelative(self.mission_lat,    # Mission latitude
                                                    self.mission_lon,    # Mission longitude
                                                    self.mission_height  # Mission altitude
