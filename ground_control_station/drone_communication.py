@@ -5,6 +5,7 @@
 
 import serial
 import socket
+import calendar
 
 
 class DroneComms:
@@ -28,6 +29,22 @@ class DroneComms:
 			raise ValueError("Who's laptop is this running on?")
 
 		# If an error is encountered here it will be handled in base_station.py
+
+		# Start handshake procedure
+		handshake_complete = False
+
+		while not handshake_complete:
+			received = self.read_message()
+
+			if received is not None:
+				print(received)
+
+			if received == "drone_online":
+				# Drone is online so send a response that GCS is too
+				epoch_string = str(calendar.timegm(time.localtime()))
+				self.send_message("gcs_online&" + epoch_string)
+			elif received == "Handshake complete.":
+				handshake_complete = True
 
 	def read_message(self):
 		"""

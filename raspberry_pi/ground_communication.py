@@ -5,12 +5,14 @@
 
 import serial
 from gpiozero import LED
+import time
+import os
 
 
 class GroundControlStation:
     def __init__(self):
         """
-        Start wireless serial connection to the GCS using the NRF24L01 modules.
+        Start wireless serial connection to the GCS using the HC-12
         Timeout - 10s
         """
 
@@ -22,6 +24,30 @@ class GroundControlStation:
             self.initSuccessful = False
 
         self.yellow_led = LED(4)
+        self.yellow_led.on()
+
+        # Start handshake procedure
+        handshake_complete = False
+
+        while not handshake_complete:
+            self.ser.write("drone_online\n".encode('utf-8'))
+            time.sleep(0.5)
+
+            handshake_response = self.read_message()
+            if handshake_response[:10] == "gcs_online":
+                epoch_string = handshake_response[11:]
+                time_object = time.gmtime(int(epoch_string))
+                time_string = time.strftime("sudo date -s \"%a %b %d %H:%M:%S UTC %Y\"", time_object)
+                try:
+                    os.system("sudo date -s \"{}\"".format(time_string))
+                except:
+                    self.send_message("Error updating time - please try again")
+                    continue
+                else:
+                    self.send_message("RPi time updated as: \"" + time_string + "\"")
+                    self.yellow_led.off()
+                    self.send_message("Handshake complete.")
+                    handshake_complete = True
 
     def read_message(self):
         """
@@ -43,7 +69,6 @@ class GroundControlStation:
         """
         Send the message back to the GCS
         """
-        self.yellow_led.off()
         self.yellow_led.blink(on_time=0.05, off_time=0.05, n=5)  # Flash quick for 0.5 seconds when sending a message
         self.yellow_led.off()
         self.ser.write((message + "\n").encode('utf-8'))
