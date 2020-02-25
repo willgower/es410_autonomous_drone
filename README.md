@@ -24,7 +24,7 @@ _mostly written for the benefit of whoever writes the GCS code (aka: me)_
 
 #### LED Colour Codes
 | Colour | Behaviour | Description |
-|--------|-------------|
+|--------|-----------|-------------|
 | ![#00ff00](https://placehold.it/15/00ff00/000000?text=+) Green | Pulsing | Script is running |
 | ![#0000ff](https://placehold.it/15/0000ff/000000?text=+) Blue | Flashing (every 1s) | Data is currently being logged |
 | ![#ffff00](https://placehold.it/15/ffff00/000000?text=+) Yellow | Flicker | TX activity to ground control station |
