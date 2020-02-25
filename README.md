@@ -22,6 +22,13 @@ Ground Control Station
 ## Drone
 _mostly written for the benefit of whoever writes the GCS code (aka: me)_
 
+#### LED Codes
+| Colour | Description |
+|--------|-------------|
+| Green | Script is running |
+| Blue | Data is currently being logged |
+| Yellow | TX activity to ground control station |
+| Red | Error, current script aborting and putting drone in idle |
 #### State: Initialisation
 Drone tries to establish connections to other parts of the system. A variety of messages sent. If successful, final message reported is `Initialisation successful.`. If initialisation fails, failure reported then the python program exits. Decided not to reboot else might get stuck in an endless cycle where we can't do anything with the pi.
 
