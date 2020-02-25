@@ -32,8 +32,7 @@ class FlightController:
         self.initSuccessful = False  # Assume connection fails
         try:
             self.vehicle = dronekit.connect('/dev/serial/by-id/usb-ArduPilot_fmuv2_390030000E51373337333031-if00',
-                                            heartbeat_timeout=15)  # /dev/ttyACM1
-            print("Successfully connected to Pixhawk!")
+                                            heartbeat_timeout=15)
             """ ONLY NEED THESE EXCEPTIONS WHEN DEBUGGING
             except socket.error:  # Bad TCP connection
                 print('No server exists!')

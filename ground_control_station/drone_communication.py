@@ -4,6 +4,7 @@
 # Description: Module to handle serial communication to the drone from the GCS
 
 import serial
+import socket
 
 
 class DroneComms:
@@ -11,14 +12,22 @@ class DroneComms:
 		"""
 		start wireless serial connection to drone
 		"""
-		self.ser = serial.Serial(
-			"/dev/serial/by-id/usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_0001-if00-port0",
-			baudrate=9600,
-			timeout=0)
-		if self.ser.is_open:
-			print("Seemed to conenct")
+		if socket.gethostname() == "william-XPS-13-9360":
+			# Start a serial connection with Will's laptop
+			self.ser = serial.Serial(
+				"/dev/serial/by-id/usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_0001-if00-port0",
+				baudrate=9600,
+				timeout=0)
+		elif socket.gethostname() == "JAMESHPLAPTOP":
+			# Start a serial connection with James' laptop
+			self.ser = serial.Serial(
+				"COM1",  # Will have to see which COM port this comes in on
+				baudrate=9600,
+				timeout=0)
 		else:
-			print("not good")
+			raise ValueError("Who's laptop is this running on?")
+
+		# If an error is encountered here it will be handled in base_station.py
 
 	def read_message(self):
 		"""
