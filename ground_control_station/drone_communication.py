@@ -21,7 +21,7 @@ class DroneComms:
 		elif socket.gethostname() == "JAMESHPLAPTOP":
 			# Start a serial connection with James' laptop
 			self.ser = serial.Serial(
-				"COM1",  # Will have to see which COM port this comes in on
+				input("Enter COM port that the HC-12 has been assigned eg. COM4: "),
 				baudrate=9600,
 				timeout=0)
 		else:
