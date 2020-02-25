@@ -33,17 +33,12 @@ class FlightController:
         try:
             self.vehicle = dronekit.connect('/dev/serial/by-id/usb-ArduPilot_fmuv2_390030000E51373337333031-if00',
                                             heartbeat_timeout=15)
-            """ ONLY NEED THESE EXCEPTIONS WHEN DEBUGGING
-            except socket.error:  # Bad TCP connection
-                print('No server exists!')
-                return
-            except OSError as e:  # Bad TTY connection
-                print('No serial exists!')
-                return
-            except dronekit.APIException:  # API Error
-                print('Timeout!')
-                return
-            """
+        except OSError:  # Bad TTY connection
+            print('No serial exists!')
+            return
+        except dronekit.APIException:  # API Error
+            print('Timeout!')
+            return
         except:  # Other error
             return
         else:
