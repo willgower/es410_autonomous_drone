@@ -15,11 +15,13 @@ def wait_for_message(message):
 	prints messages from drone until specified message is received
 	does not print specified message
 	"""
-	message = None
-	while message != message:
-		if message is not None:
-			print("   Message from drone: " + msg)
-		message = drone.read_message()
+	while True:
+		received = drone.read_message()
+		if received != message and received is not None:
+			print("   Message from drone: " + message)
+		elif received == message:
+			# return without printing anything
+			return
 
 
 def verify(action):
