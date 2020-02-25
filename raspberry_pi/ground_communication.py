@@ -58,5 +58,6 @@ if __name__ == "__main__":
 
         if received is not None:
             print("Received: " + received)
-            gcs.send_message(received + " --- RESPONSE!")
-            print("Sent reply")
+            response = received + " --- RESPONSE!"
+            gcs.send_message(response)
+            print("Sent reply: " + response)
