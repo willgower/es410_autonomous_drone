@@ -68,5 +68,5 @@ if __name__ == "__main__":
 		response = drone.read_message()
 		if response is not None:
 			print("Received: " + response)
-		time.sleep(0.5)
+		time.sleep(2)
 		counter += 1
