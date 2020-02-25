@@ -37,8 +37,8 @@ On entry: `Drone is idle. Waiting for command.`
 | Key | Data type | Comments |
 |---------|-------------|-------------------|
 | title | string | used for log title |
-|  |  |  |
-|  |  |  |
+| location | string | a valid name from locations.txt |
+| altitude | int | the mission altitude in metres |
 
 Once the drone receives the mission, it processes it, saving and distributing the necessary parameters. Upon completion, `Mission processing finished.` is returned.
 
