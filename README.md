@@ -26,9 +26,10 @@ _mostly written for the benefit of whoever writes the GCS code (aka: me)_
 | Colour | Behaviour | Description |
 |--------|-----------|-------------|
 | ![#00ff00](https://placehold.it/15/00ff00/000000?text=+) Green | Pulsing | Script is running |
-| ![#0000ff](https://placehold.it/15/0000ff/000000?text=+) Blue | Flashing (every 1s) | Data is currently being logged |
+| ![#0000ff](https://placehold.it/15/0000ff/000000?text=+) Blue | Flashing (every 1s) | Data logging is active |
 | ![#ffff00](https://placehold.it/15/ffff00/000000?text=+) Yellow | Flicker | TX activity to ground control station |
 | ![#ff0000](https://placehold.it/15/ff0000/000000?text=+) Red | Flashing (for 5s) | Error, current script aborting and putting drone in idle |
+
 #### State: Initialisation
 Drone tries to establish connections to other parts of the system. A variety of messages sent. If successful, final message reported is `Initialisation successful.`. If initialisation fails, failure reported then the python program exits. Decided not to reboot else might get stuck in an endless cycle where we can't do anything with the pi.
 
