@@ -17,14 +17,24 @@ import os
 from datetime import datetime as dt
 from gpiozero import Button, LED, PWMLED
 
+test = "logging"  # 'logging', 'take off' or 'mission'
+
 
 class DroneControl:
-	def __init__(self, log_only):
+	def __init__(self):
 		"""
 		instantiate objects 
 		this process will establish communication links
 		if fail then raise an exception that will terminate the program
 		"""
+
+		# dictionary of flight parameters
+		self.parameters = {
+			"traverse_alt": 10,
+			"descent_vel": 0.25,
+			"logging_interval": 0.1
+		}
+
 		self.green_led = PWMLED(22)
 		self.blue_led = LED(27)
 		self.red_led = LED(17)
@@ -32,7 +42,7 @@ class DroneControl:
 		self.green_led.pulse(fade_in_time=0.5, fade_out_time=0.5)  # Pulse the green LED constantly while script is running
 
 		self.gcs = GroundControlStation()
-		if self.gcs.initSuccessful or log_only:
+		if self.gcs.initSuccessful:
 			self.report("Link to GCS established")
 		else:
 			# if fail to open link to GCS no means of reporting so enter specific sequence
@@ -60,44 +70,14 @@ class DroneControl:
 		self.button.hold_time = 3
 		self.button.when_held = self.__prepare_exit
 
+		self.scheduler = RecurringTimer(self.parameters["logging_interval"], self.__monitor_flight)
+
 		# Setting up class attributes
 		self.abortFlag = None
 		self.emergency_land = False
-		self.mission_title = ""
 		self.state = None
-		self.scheduler = None
 		self.received_mission = None
-
-		# dictionary of flight parameters
-		self.parameters = {
-			"traverse_alt": 10,
-			"descent_vel": 0.25
-		}
-
-	def friday_test(self):
-		while True:
-			print("Short press for logging. Long press to end script.")
-
-			# Wait for the button press to start data logging
-			self.button.wait_for_press()
-			self.button.wait_for_release()  # Only start logging when it is pressed and released
-
-			# Set up and start logging
-			self.logger.prepare_for_logging(dt.now().strftime("%H:%M:%S-%d_%b"))
-			print("Logging started")
-			self.blue_led.blink(on_time=0.3, off_time=0.7)
-			self.scheduler = RecurringTimer(0.1, self.__monitor_flight)
-
-			# Add a minimum logging time
-			time.sleep(5)
-
-			# Wait for the button press to stop data logging
-			self.button.wait_for_press()
-			self.button.wait_for_release()
-			self.scheduler.stop()
-			self.logger.finish_logging()
-			print("Logging stopped")
-			self.blue_led.off()
+		self.mission_title = "Default mission name"
 
 	def alert_initialisation_failure(self):
 		"""
@@ -161,11 +141,11 @@ class DroneControl:
 
 	def process_mission(self):
 		""" 
-		This function will sit and wait for a mission to be received from the GCS
-		this function must process and set as the mission on the flight controller (FC)
-		If the mission requests data logging then it will also need to be triggered here.
+		Processes the received mission
 		"""
-		self.mission_title = "Mission Name Here"  # GCS will provide a mission name for logging purposes
+		self.mission_title = self.received_mission["title"]
+		self.fc.set_destination(self.received_mission["location"])
+		self.fc.mission_height = int(self.received_mission["altitude"])
 
 		self.report("Mission processing finished.")
 
@@ -238,30 +218,6 @@ class DroneControl:
 		else:
 			self.report("Drone ready to arm.")
 
-	"""
-	FUNCTION DEPRECATED
-	HWSS is completely isolated from software
-	James pleaase confirm then delete
-	
-	def wait_for_safety_switch(self):
-		\"""
-		loop to until hardware safety switch is pressed
-		timeout after 30 s
-		\"""
-		self.report("Waiting for hardware safety switch to be pressed.")
-		
-		# wait for hardware safety switch to be pressed - timeout 30 s
-		timeout = 30
-		start = time.perf_counter()
-		while time.perf_counter() - start < timeout:
-			if self.fc.get_hwss_status(): 
-				self.report("Switch pressed.")
-				break
-		else:
-			self.report("Switch press timed out.")
-			self.abort()
-	"""
-
 	def wait_for_flight_authorisation(self):
 		"""
 		wait for authorisation from ground control station to begin flight
@@ -287,13 +243,10 @@ class DroneControl:
 		report to base
 		continue when loiter point reached
 		"""                
-		
+
+		# Start data logging
 		self.logger.prepare_for_logging(self.mission_title)
-		
-		# setup timer
-		interval = 1  # second
-		# this will start timer also
-		self.scheduler = RecurringTimer(interval, self.__monitor_flight)
+		self.scheduler.start()
 		
 		self.report("Drone is taking off...")
 		self.fc.begin_flight()
@@ -325,9 +278,9 @@ class DroneControl:
 		# land
 		self.state = "Landing"
 		self.fc.land()
-		#
-		# check above land() is blocking
-		#
+		###########################################
+		# check that land() is blocking from SITL #
+		###########################################
 
 		drone.report("Drone landed.")
 
@@ -419,8 +372,7 @@ class DroneControl:
 		os._exit(0)
 
 
-"""
-if __name__ == "__main__":
+if test == "mission":
 	# === INITIALISATION ===
 	# try to initialise drone
 	# if fail then print error and exit program
@@ -470,8 +422,6 @@ if __name__ == "__main__":
 
 		if drone.abortFlag: continue
 
-		# state: wait for hardware safety switch pressed
-		drone.wait_for_safety_switch()
 		# pause for 5 seconds to prevent immediate arming
 		time.sleep(5)
 
@@ -493,15 +443,103 @@ if __name__ == "__main__":
 		drone.execute_flight()
 
 		drone.report("Flight complete. Drone at home.")
-"""
 
-if __name__ == "__main__":
+if test == "logging":
 	try:
-		drone = DroneControl(True)
+		drone = DroneControl()
 	except ValueError as error:
 		print(error)
 		sys.exit()
 	else:
-		print("Initialisation successful.")
+		drone.report("Initialisation successful.")
 
-	drone.friday_test()
+	while True:
+		# Wait for the button press to start data logging
+		drone.report("Short press for logging. Long press to end script.")
+		drone.button.wait_for_press()
+		drone.button.wait_for_release()  # Only start logging when it is pressed and released
+
+		# Set up and start logging
+		drone.logger.prepare_for_logging(dt.now().strftime("%H:%M:%S-%d_%b"))
+		drone.report("Logging started")
+		drone.blue_led.blink(on_time=0.3, off_time=0.7)
+
+		# Add a minimum logging time
+		time.sleep(5)
+
+		# Wait for the button press to stop data logging
+		drone.button.wait_for_press()
+		drone.button.wait_for_release()
+		drone.scheduler.stop()
+		drone.logger.finish_logging()
+		drone.report("Logging stopped")
+		drone.blue_led.off()
+
+if test == "take off":
+	try:
+		drone = DroneControl()
+	except ValueError as error:
+		print(error)
+		sys.exit()
+	else:
+		drone.report("Initialisation successful.")
+
+	# if exception raised in initialisation then this will not execute because sys.exit()
+	while True:
+		# === IDLE ===
+		# state: idle
+		drone.abortFlag = False
+		cmd = drone.wait_for_command()
+
+		# === SETTING UP FLIGHT ===
+		if cmd == 0:
+			drone.shutdown()
+		elif cmd == 1:
+			drone.process_mission()
+		elif cmd == 2:
+			drone.reboot()
+		else:
+			# should never happen
+			print("Aborting... Why has this happened?")
+			drone.abort()
+
+		# if abort flag is set, stop current iteration and continue with next
+		# this sends drone back to idle state
+		if drone.abortFlag: continue
+
+		# state: wait for battery load
+		drone.battery_load()
+
+		if drone.abortFlag: continue
+
+		# state: wait for parcel load
+		drone.parcel_load()
+
+		if drone.abortFlag: continue
+
+		# state: performing arming check
+		drone.check_armable()
+
+		if drone.abortFlag: continue
+
+		# pause for 5 seconds to prevent immediate arming
+		time.sleep(5)
+
+		if drone.abortFlag: continue
+
+		# state: wait for take off authorisation
+		drone.wait_for_flight_authorisation()
+
+		if drone.abortFlag: continue
+
+		# === FLYING ===
+		# state: flying
+		drone.execute_flight()
+
+		drone.release_package()
+
+		drone.upload_return_mission()
+
+		drone.execute_flight()
+
+		drone.report("Flight complete. Drone at home.")
