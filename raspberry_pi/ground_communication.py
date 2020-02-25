@@ -34,6 +34,9 @@ class GroundControlStation:
             time.sleep(0.5)
 
             handshake_response = self.read_message()
+            if handshake_response is None:
+                continue
+
             if handshake_response[:10] == "gcs_online":
                 epoch_string = handshake_response[11:]
                 time_object = time.gmtime(int(epoch_string))
