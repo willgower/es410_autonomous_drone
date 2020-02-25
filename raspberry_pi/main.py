@@ -97,10 +97,10 @@ class DroneControl:
 		"""
 		called at any time and will reset drone so in idle state
 		"""
+		self.red_led.blink(on_time=0.1, off_time=0.1, n=25)  # Flash red for 5 seconds while going back to idle
 		self.report("Aborting mission...")
 		self.abortFlag = True
 		self.report("Mission abort successful.")
-		self.red_led.blink(on_time=0.1, off_time=0.1, n=20)
 
 	def wait_for_command(self):
 		"""
