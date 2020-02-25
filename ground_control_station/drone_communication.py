@@ -59,8 +59,6 @@ if __name__ == "__main__":
 	drone = DroneComms()
 	counter = 0
 
-	drone.read_message()
-
 	while True:
 		message = "Testing" + str(counter).zfill(2)
 		drone.send_message(message)
