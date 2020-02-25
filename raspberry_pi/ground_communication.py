@@ -4,6 +4,7 @@
 # Description: Module to handle serial communication to the ground control station
 
 import serial
+from gpiozero import LED
 
 
 class GroundControlStation:
@@ -19,6 +20,8 @@ class GroundControlStation:
             self.initSuccessful = True
         else:
             self.initSuccessful = False
+
+        self.yellow_led = LED(4)
 
     def read_message(self):
         """
@@ -40,6 +43,7 @@ class GroundControlStation:
         """
         Send the message back to the GCS
         """
+        self.yellow_led.blink(on_time=0.05, off_time=0.05, n=20)  # Flash quick for 1 second when sending a message
         self.ser.write((message + "\n").encode('utf-8'))
 
     def close(self):
