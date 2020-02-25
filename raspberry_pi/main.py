@@ -26,14 +26,10 @@ class DroneControl:
 		if fail then raise an exception that will terminate the program
 		"""
 		self.green_led = PWMLED(22)
-		self.blue_led = PWMLED(27)
-		self.red_led = PWMLED(17)
-		self.yellow_led = PWMLED(4)
+		self.blue_led = LED(27)
+		self.red_led = LED(17)
 
 		self.green_led.pulse(fade_in_time=0.5, fade_out_time=0.5)  # Pulse the green LED constantly while script is running
-		self.blue_led.pulse(fade_in_time=0.2, fade_out_time=0.2)  # Pulse the green LED constantly while script is running
-		self.red_led.pulse(fade_in_time=1, fade_out_time=1)  # Pulse the green LED constantly while script is running
-		self.yellow_led.pulse(fade_in_time=2, fade_out_time=2, background=False)  # Pulse the green LED constantly while script is running
 
 		self.gcs = GroundControlStation()
 		if self.gcs.initSuccessful or log_only:
@@ -114,7 +110,6 @@ class DroneControl:
 		"""
 		method to directly report a message to GCS
 		"""
-		self.yellow_led.blink(on_time=0.05, off_time=0.05, n=20)  # Flash quick for 1 second when sending a message
 		self.gcs.send_message(message)
 		print(message)
 
