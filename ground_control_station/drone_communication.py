@@ -14,7 +14,7 @@ class DroneComms:
 		self.ser = serial.Serial(
 			"/dev/serial/by-id/usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_0001-if00-port0",
 			baudrate=9600,
-			timeout=1)
+			timeout=0)
 		if self.ser.is_open:
 			print("Seemed to conenct")
 		else:
@@ -23,22 +23,22 @@ class DroneComms:
 	def read_message(self):
 		"""
 		Read the latest message from the serial buffer and return it
-		Will - is this going to return None if no message read?
+		Return None if no message available
 		"""
 		message_length = self.ser.in_waiting
 
 		if message_length > 0:
-			message = self.ser.readline().decode().strip()
+			received = self.ser.readline().decode().strip()
 		else:
-			message = None
+			received = None
 
-		return message
+		return received
 
-	def send_message(self, message):
+	def send_message(self, to_send):
 		"""
 		Send message to drone
 		"""
-		self.ser.write((message + "\n").encode('utf-8'))
+		self.ser.write((to_send + "\n").encode('utf-8'))
 
 	def is_comms_open(self):
 		"""
@@ -59,13 +59,16 @@ if __name__ == "__main__":
 	drone = DroneComms()
 	counter = 0
 
+	drone.read_message()
+
 	while True:
-		message = "Testing" + str(counter).zfill(3)
+		message = "Testing" + str(counter).zfill(2)
 		drone.send_message(message)
 		print("Sent: " + message)
 
+		time.sleep(0.5)
 		response = drone.read_message()
 		if response is not None:
 			print("Received: " + response)
-		time.sleep(1)
+		time.sleep(0.5)
 		counter += 1
