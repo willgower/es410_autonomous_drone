@@ -13,6 +13,7 @@ class DataLogging:
     def __init__(self):
         self.currently_logging = False
         self.data_file = None
+        self.backup_file = None
         self.blue_led = LED(27)
 
     def prepare_for_logging(self, name):
@@ -22,15 +23,16 @@ class DataLogging:
         """
         self.currently_logging = True
 
-        try:  # Memory stick first
-            os.system("sudo mount /dev/disk/by-uuid/0177-74FD /media/usb_logger")
-            self.data_file = open("/media/usb_logger/" + name + ".csv", "w+")
-        except:  # Try locally on the Pi
-            self.data_file = open(os.path.dirname(os.path.abspath(__file__)) + "/logging/" + name + ".csv", "w+")
+        # Mount memory stick and open file on it
+        os.system("sudo mount /dev/disk/by-uuid/0177-74FD /media/usb_logger -o noauto,users,rw,umask=0")
+        self.data_file = open("/media/usb_logger/" + name + ".csv", "w+")
 
-        self.data_file.write("Logging started at " + dt.now().strftime("%d-%m-%y at %H:%M:%S\n"))
-        self.data_file.write("Timestamp, Longitude, Latitude, Altitude, Velocity, "
-                             "Groundspeed, Airspeed, Current, Voltage\n")
+        # Also create a backup file locally in the logging folder
+        self.backup_file = open(os.path.dirname(os.path.abspath(__file__)) + "/logging/" + name + ".csv", "w+")
+
+        for file in self.data_file, self.backup_file:
+            file.write("Logging started at " + dt.now().strftime("%d-%m-%y at %H:%M:%S\n"))
+            file.write("Timestamp, Longitude, Latitude, Altitude, Velocity, Groundspeed, Airspeed, Current, Voltage\n")
 
     def log_info(self, current, fc_data_in):
         """
@@ -49,12 +51,14 @@ class DataLogging:
                 "Voltage": fc_data_in["Battery"]}
 
         self.data_file.write(', '.join(data.values()) + "\n")
+        self.backup_file.write(', '.join(data.values()) + "\n")
         
     def finish_logging(self):
         """
         flight finished, close file
         """
         self.data_file.close()
+        self.backup_file.close()
         try:
             os.system("sudo umount /media/usb_logger")
         except:
