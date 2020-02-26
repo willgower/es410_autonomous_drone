@@ -87,7 +87,7 @@ if __name__ == "__main__":
 	counter = 0
 
 	while True:
-		message = "Testing" + str(counter).zfill(2)
+		message = "Testing" + str(counter).zfill(3)
 		drone.send_message(message)
 		print("Sent: " + message)
 
