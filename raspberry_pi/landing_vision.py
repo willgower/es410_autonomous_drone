@@ -60,7 +60,7 @@ class LandingVision:
         cap = cv2.VideoCapture(0)
 
         # Load our image template, this is our reference image - the drone logo
-        image_template = cv2.imread('C:/Users/Aaron/AppData/Local/Programs/Python/Python36/Image Processing Photos/Drone Logo/DroneLogo.png',0) 
+        image_template = cv2.imread('DroneLogo.png',0) 
 
         while True:
             # Get webcam images
@@ -81,9 +81,6 @@ class LandingVision:
 
             # Draw rectangular window for our region of interest   
             window = cv2.rectangle(frame, (top_left_x,top_left_y), (bottom_right_x,bottom_right_y), 255, 0)
-
-            # Flip frame orientation horizontally
-            frame = cv2.flip(frame,1)
 
             # Get number of SIFT matches
             matches = sift_detector(window, image_template)
@@ -147,7 +144,7 @@ class LandingVision:
                 #calculate the x,y coordinates from the centre of field of view to centre of logo
                 x_logo = center[0]
                 y_logo = center[1]
-                x_vel = ((width/2) - x_logo)  * (-1) #axis is inverted
+                x_vel = (width/2) - x_logo
                 y_vel = (height/2) - y_logo
                 logo_coordinates = [x_vel, y_vel]
 
