@@ -72,15 +72,14 @@ class DataLogging:
 
 
 def log_random():
-    fc_data = {"voltage": str(randint(20)),
-               "location": str(randint(20)),
+    fc_data = {"voltage": str(randint(10, 20)),
+               "location": str(randint(200, 300)),
                "velocity": choice(["fast", "slow", "average"])}
     data_logging.log_info(90, json.JSONEncoder().encode(fc_data))
 
 
 if __name__ == "__main__":
     from random import choice, randint
-    from math import floor
     from recurring_timer import RecurringTimer
     import time
 
@@ -94,7 +93,9 @@ if __name__ == "__main__":
     # Add a minimum logging time
     time.sleep(5)
 
-    while input("Hit enter to finish logging!") != "":
-        scheduler.stop()
-        data_logging.finish_logging()
-        print("Logging stopped")
+    while True:
+        if input("Hit enter to finish logging!") == "":
+            scheduler.stop()
+            data_logging.finish_logging()
+            print("Logging stopped")
+            break
