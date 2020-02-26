@@ -79,7 +79,7 @@ def log_random():
             "Velocity": randint(1, 10),
             "Groundspeed": randint(1, 10),
             "Airspeed": randint(1, 10),
-            "Voltage": randint(14, 17)}
+            "Battery": randint(14, 17)}
 
     data_logging.log_info(90, data)
 
