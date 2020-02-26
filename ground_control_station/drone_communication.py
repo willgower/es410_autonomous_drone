@@ -34,6 +34,7 @@ class DroneComms:
 		handshake_complete = False
 
 		while not handshake_complete:
+			time.sleep(0.5)
 			received = self.read_message()
 
 			if received is not None:

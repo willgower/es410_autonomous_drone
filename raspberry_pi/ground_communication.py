@@ -40,7 +40,7 @@ class GroundControlStation:
             if handshake_response[:10] == "gcs_online":
                 epoch_string = handshake_response[11:]
                 time_object = time.gmtime(int(epoch_string))
-                time_string = time.strftime("sudo date -s \"%a %b %d %H:%M:%S UTC %Y\"", time_object)
+                time_string = time.strftime("%a %b %d %H:%M:%S UTC %Y", time_object)
                 try:
                     os.system("sudo date -s \"{}\"".format(time_string))
                 except:
