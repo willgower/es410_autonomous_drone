@@ -5,21 +5,9 @@
 
 import dronekit
 from pymavlink import mavutil
-import socket
 import time
 import os
 import math
-
-
-def get_distance_metres(location_1, location_2):
-    """
-    Returns the ground distance in metres between two LocationGlobal objects.
-    Modified from dronekit example documentation
-    The final term deals with the earths curvature
-    """
-    dlat = location_2.lat - location_1.lat
-    dlong = location_2.lon - location_1.lon
-    return math.sqrt((dlat * dlat) + (dlong * dlong)) * 1.113195e5
 
 
 class FlightController:
@@ -31,8 +19,10 @@ class FlightController:
         """
         self.initSuccessful = False  # Assume connection fails
         try:
+            # There is no timeout on this connection becoming available meaning that the
+            # RPi and Pixhawk must be plugged together as the companion computer boots
             self.vehicle = dronekit.connect('/dev/serial/by-id/usb-ArduPilot_fmuv2_390030000E51373337333031-if00',
-                                            heartbeat_timeout=15)
+                                            heartbeat_timeout=5, wait_ready=True)
         except OSError:  # Bad TTY connection
             print('No serial exists!')
             return
@@ -199,9 +189,20 @@ class FlightController:
         self.vehicle.close()
 
 
+def get_distance_metres(location_1, location_2):
+    """
+    Returns the ground distance in metres between two LocationGlobal objects.
+    Modified from dronekit example documentation
+    The final term deals with the earths curvature
+    """
+    dlat = location_2.lat - location_1.lat
+    dlong = location_2.lon - location_1.lon
+    return math.sqrt((dlat * dlat) + (dlong * dlong)) * 1.113195e5
+
+
 if __name__ == "__main__":
     fc = FlightController()
     if fc.initSuccessful:
-        print(fc.get_fc_status())
+        print(fc.get_fc_stats())
     else:
         quit()
