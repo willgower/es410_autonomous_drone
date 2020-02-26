@@ -85,13 +85,13 @@ def log_random():
 
 
 if __name__ == "__main__":
-    from random import choice, randint
+    from random import randint
     from recurring_timer import RecurringTimer
     import time
 
     scheduler = RecurringTimer(0.1, log_random)
     data_logging = DataLogging()
-    data_logging.prepare_for_logging("test_2")
+    data_logging.prepare_for_logging("test_bench")
 
     scheduler.start()
     print("Logging started")
