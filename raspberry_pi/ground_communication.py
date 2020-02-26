@@ -75,7 +75,7 @@ class GroundControlStation:
         Send the message back to the GCS
         """
         self.yellow_led.off()
-        self.yellow_led.blink(on_time=0.05, off_time=0.05, n=5)  # Flash quick for 0.5 seconds when sending a message
+        self.yellow_led.blink(on_time=0.05, off_time=0.05, n=6)  # Flash quick for 0.5 seconds when sending a message
         self.ser.write((message + "\n").encode('utf-8'))
 
     def close(self):
