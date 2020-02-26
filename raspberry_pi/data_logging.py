@@ -77,7 +77,7 @@ def log_random():
             "Location lat": "Location lat",
             "Location alt": "Location alt",
             "Velocity": randint(1, 10),
-            "Ground Speed": randint(1, 10),
+            "Groundspeed": randint(1, 10),
             "Airspeed": randint(1, 10),
             "Voltage": randint(14, 17)}
 
