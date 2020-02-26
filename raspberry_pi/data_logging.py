@@ -72,10 +72,16 @@ class DataLogging:
 
 
 def log_random():
-    fc_data = {"voltage": str(randint(10, 20)),
-               "location": str(randint(200, 300)),
-               "velocity": choice(["fast", "slow", "average"])}
-    data_logging.log_info(90, json.JSONEncoder().encode(fc_data))
+    data = {"Timestamp": dt.now().strftime("%H:%M:%S.%f"),
+            "Location lon": "Location lon",
+            "Location lat": "Location lat",
+            "Location alt": "Location alt",
+            "Velocity": randint(1, 10),
+            "Ground Speed": randint(1, 10),
+            "Airspeed": randint(1, 10),
+            "Voltage": randint(14, 17)}
+
+    data_logging.log_info(90, data)
 
 
 if __name__ == "__main__":
