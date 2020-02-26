@@ -76,10 +76,10 @@ def log_random():
             "Location lon": "Location lon",
             "Location lat": "Location lat",
             "Location alt": "Location alt",
-            "Velocity": randint(1, 10),
-            "Groundspeed": randint(1, 10),
-            "Airspeed": randint(1, 10),
-            "Battery": randint(14, 17)}
+            "Velocity": str(randint(1, 10)),
+            "Groundspeed": str(randint(1, 10)),
+            "Airspeed": str(randint(1, 10)),
+            "Battery": str(randint(14, 17))}
 
     data_logging.log_info(90, data)
 
