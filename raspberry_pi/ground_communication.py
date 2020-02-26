@@ -48,8 +48,10 @@ class GroundControlStation:
                     continue
                 else:
                     self.send_message("RPi time updated as: \"" + time_string + "\"")
-                    self.yellow_led.off()
+                    print("RPi time updated as: \"" + time_string + "\"")
                     self.send_message("Handshake complete.")
+                    print("Handshake complete.")
+                    self.yellow_led.off()
                     handshake_complete = True
 
     def read_message(self):
