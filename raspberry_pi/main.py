@@ -477,4 +477,25 @@ if test == "take off":
     else:
         drone.report("Initialisation successful.")
 
-# Take off and land here
+    # state: performing arming check
+    drone.check_armable()
+
+    # pause for 5 seconds to prevent immediate arming
+    time.sleep(5)
+
+    # state: wait for take off authorisation
+    drone.wait_for_flight_authorisation()
+
+    # === FLYING ===
+    # state: flying
+    drone.fc.vehicle.simple_takeoff(5)
+
+    alt = drone.fc.get_altitude()
+    while alt < 4.5:
+        time.sleep(1)
+        drone.report("Still ascending. Current altitude: " + alt)
+        alt = drone.fc.get_altitude()
+
+    # Drone has reached target altitude so now land
+    drone.report("Starting to land")
+    drone.fc.land()
