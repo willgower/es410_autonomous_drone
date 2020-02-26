@@ -63,7 +63,6 @@ class DroneControl:
 		self.logger = DataLogging()
 		self.vision = LandingVision()
 
-		self.blue_led = LED(27)
 		self.red_led = LED(17)
 		self.button = Button(26)
 		self.button.hold_time = 3
@@ -290,8 +289,6 @@ class DroneControl:
 		"""
 		Get flight data from various places and send them to the data logging module
 		"""
-		# set timer so that it runs recursively
-		# self.scheduler.start()
 		
 		if self.gcs.read_message() == "emergency land":
 			while True:
@@ -362,7 +359,7 @@ class DroneControl:
 		self.gcs.close()
 
 		self.green_led.close()
-		self.blue_led.close()
+		# self.blue_led.close()
 		self.red_led.close()
 		self.button.close()
 
@@ -460,8 +457,8 @@ if test == "logging":
 
 		# Set up and start logging
 		drone.logger.prepare_for_logging(dt.now().strftime("%H:%M:%S-%d_%b"))
+		drone.scheduler.start()
 		drone.report("Logging started")
-		drone.blue_led.blink(on_time=0.3, off_time=0.7)
 
 		# Add a minimum logging time
 		time.sleep(5)
@@ -472,7 +469,7 @@ if test == "logging":
 		drone.scheduler.stop()
 		drone.logger.finish_logging()
 		drone.report("Logging stopped")
-		drone.blue_led.off()
+		# drone.blue_led.off()
 
 if test == "take off":
 	try:
@@ -483,62 +480,4 @@ if test == "take off":
 	else:
 		drone.report("Initialisation successful.")
 
-	# if exception raised in initialisation then this will not execute because sys.exit()
-	while True:
-		# === IDLE ===
-		# state: idle
-		drone.abortFlag = False
-		cmd = drone.wait_for_command()
-
-		# === SETTING UP FLIGHT ===
-		if cmd == 0:
-			drone.shutdown()
-		elif cmd == 1:
-			drone.process_mission()
-		elif cmd == 2:
-			drone.reboot()
-		else:
-			# should never happen
-			print("Aborting... Why has this happened?")
-			drone.abort()
-
-		# if abort flag is set, stop current iteration and continue with next
-		# this sends drone back to idle state
-		if drone.abortFlag: continue
-
-		# state: wait for battery load
-		drone.battery_load()
-
-		if drone.abortFlag: continue
-
-		# state: wait for parcel load
-		drone.parcel_load()
-
-		if drone.abortFlag: continue
-
-		# state: performing arming check
-		drone.check_armable()
-
-		if drone.abortFlag: continue
-
-		# pause for 5 seconds to prevent immediate arming
-		time.sleep(5)
-
-		if drone.abortFlag: continue
-
-		# state: wait for take off authorisation
-		drone.wait_for_flight_authorisation()
-
-		if drone.abortFlag: continue
-
-		# === FLYING ===
-		# state: flying
-		drone.execute_flight()
-
-		drone.release_package()
-
-		drone.upload_return_mission()
-
-		drone.execute_flight()
-
-		drone.report("Flight complete. Drone at home.")
+	# Take off and land here
