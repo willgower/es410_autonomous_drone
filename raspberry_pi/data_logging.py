@@ -6,12 +6,14 @@
 from datetime import datetime as dt
 import json
 import os
+from gpiozero import LED
 
 
 class DataLogging:
     def __init__(self):
         self.currently_logging = False
         self.data_file = None
+        self.blue_led = LED(27)
 
     def prepare_for_logging(self, name):
         """
@@ -34,6 +36,7 @@ class DataLogging:
         """
         function should save information to a file in appropriate format
         """
+        self.blue_led.blink(on_time=0.05, n=1)
 
         data = {"Timestamp": dt.now().strftime("%H:%M:%S.%f"),
                 "Location lon": fc_data_in["Location lon"],
@@ -65,17 +68,33 @@ class DataLogging:
         """
         if self.currently_logging:
             self.finish_logging()
+        self.blue_led.close()
+
+
+def log_random():
+    fc_data = {"voltage": str(randint(20)),
+               "location": str(randint(20)),
+               "velocity": choice(["fast", "slow", "average"])}
+    data_logging.log_info(90, json.JSONEncoder().encode(fc_data))
 
 
 if __name__ == "__main__":
-    from random import random, choice
+    from random import choice, randint
     from math import floor
+    from recurring_timer import RecurringTimer
+    import time
 
+    scheduler = RecurringTimer(0.1, log_random)
     data_logging = DataLogging()
     data_logging.prepare_for_logging("test_2")
-    for x in range(10):
-        fc_data = {"voltage": str(x * 10),
-                   "location": str(floor(100 * random())),
-                   "velocity": choice(["fast", "slow", "average"])}
-        data_logging.log_info(x + 1, json.JSONEncoder().encode(fc_data))
-    data_logging.finish_logging()
+
+    scheduler.start()
+    print("Logging started")
+
+    # Add a minimum logging time
+    time.sleep(5)
+
+    while input("Hit enter to finish logging!") != "":
+        scheduler.stop()
+        data_logging.finish_logging()
+        print("Logging stopped")
