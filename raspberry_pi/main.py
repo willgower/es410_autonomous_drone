@@ -36,9 +36,6 @@ class DroneControl:
 		}
 
 		self.green_led = PWMLED(22)
-		self.blue_led = LED(27)
-		self.red_led = LED(17)
-
 		self.green_led.pulse(fade_in_time=0.5, fade_out_time=0.5)  # Pulse the green LED constantly while script is running
 
 		self.gcs = GroundControlStation()
@@ -66,6 +63,8 @@ class DroneControl:
 		self.logger = DataLogging()
 		self.vision = LandingVision()
 
+		self.blue_led = LED(27)
+		self.red_led = LED(17)
 		self.button = Button(26)
 		self.button.hold_time = 3
 		self.button.when_held = self.__prepare_exit
