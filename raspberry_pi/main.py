@@ -306,8 +306,8 @@ class DroneControl:
 
         message = "State: " + self.state + \
                   "Altitude :" + fc_stats["Location alt"] + \
-                  "Distance to waypoint :" + fc_stats["Distance to waypoint"] + \
-                  "Battery Voltage (mV): " + fc_stats["Battery"]
+                  "Distance to waypoint :" + fc_stats["Distance to waypoint"]  # + \
+                  # "Battery Voltage (mV): " + fc_stats["Battery"]
         self.report(message)
 
     def release_package(self):
