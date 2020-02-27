@@ -19,6 +19,8 @@ import time
 from collections import deque
 import imutils
 import cv2
+import numpy as np
+import math
 
 
 class LandingVision:
@@ -61,7 +63,6 @@ class LandingVision:
         return len(good_matches)
 
     def get_instruction(self, altitude):
-        while altitude > 
         # initialize the camera and grab a reference to the raw camera capture
         camera = PiCamera()
         camera.resolution = (640, 480)
@@ -103,6 +104,12 @@ class LandingVision:
             # Our threshold to indicate object deteciton
             # We use 10 since the SIFT detector returns little false positves
             threshold = 90
+            
+            #determine pixel and actual dimensions
+            Horizontal_FOV = 62.2 #horizontal angular field of view
+            Vertical_FOV = 48.8 #vertical angular field of view
+            actualHorizontal = math.tan(math.radians(Horizontal_FOV/2))*altitude*2 #FOV in metres
+            actualVertical = math.tan(math.radians(Horizontal_FOV/2))*altitude*2 #FOV in metres
 
             # If matches exceed our threshold then logo has been detected
             if matches > threshold:
@@ -114,10 +121,7 @@ class LandingVision:
                 colorUpper = (180, 255, 255)
                 pts = deque()
 
-                # resize the frame, inverted ("vertical flip" w/ 180degrees),
-                # blur it, and convert it to the HSV color space
-                frame = imutils.resize(frame, width=600)
-                # blurred = cv2.GaussianBlur(frame, (11, 11), 0)
+                # convert frame to the HSV color space
                 hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
                 # construct a mask for the color "red", then perform
@@ -160,8 +164,9 @@ class LandingVision:
                 y_coordinate = (height/2) - y_logo
                 logo_coordinates = [x_coordinate, y_coordinate]
                 
-                #determine pixel and actual dimensions
-                
+                #determine distances to travel in each direction
+                x_vel = (x_coordinate/width) * actualHorizontal
+                y_vel = (y_coordinate/height) * actualVertical
                 
                 #initiate landing when drone is centered on landing zone logo
                 while logo_coordinates == [0, 0]:
