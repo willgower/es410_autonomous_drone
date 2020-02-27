@@ -307,9 +307,10 @@ class DroneControl:
 
         if self.reporting_count % 10 == 0:
             message = "State: " + self.state \
-                      + "  |  Altitude :" + fc_stats["Location alt"] \
+                      + "  |  Altitude: " + fc_stats["Location alt"].ljust(4) \
                       + "  |  Distance to waypoint: " + fc_stats["Distance to waypoint"] \
-                      + "  |  Battery Voltage (mV): " + fc_stats["Battery"]
+                      + "  |  Battery Voltage (mV): " + fc_stats["Battery"].ljust(5) \
+                      + "  |  Current (A): " + str(current).ljust(5)
 
             self.report(message)
 
@@ -472,6 +473,7 @@ if test == "logging":
         drone.button.wait_for_press()
         drone.button.wait_for_release()
         drone.scheduler.stop()
+        time.sleep(0.15)
         drone.logger.finish_logging()
         drone.report("Logging stopped")
 

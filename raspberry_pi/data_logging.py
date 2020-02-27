@@ -23,9 +23,12 @@ class DataLogging:
         """
         self.currently_logging = True
 
-        # Mount memory stick and open file on it
-        os.system("sudo mount /dev/disk/by-uuid/0177-74FD /media/usb_logger -o noauto,users,rw,umask=0")
-        self.data_file = open("/media/usb_logger/" + name + ".csv", "w+")
+        try:
+            # Mount memory stick and open file on it
+            os.system("sudo mount /dev/disk/by-uuid/0177-74FD /media/usb_logger -o noauto,users,rw,umask=0")
+            self.data_file = open("/media/usb_logger/" + name + ".csv", "w+")
+        except:
+            pass
 
         # Also create a backup file locally in the logging folder
         self.backup_file = open(os.path.dirname(os.path.abspath(__file__)) + "/logging/" + name + ".csv", "w+")
