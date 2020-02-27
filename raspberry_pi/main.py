@@ -74,7 +74,7 @@ class DroneControl:
         # Setting up class attributes
         self.abortFlag = None
         self.emergency_land = False
-        self.state = ""
+        self.state = "Initial"
         self.received_mission = None
         self.mission_title = "Default mission name"
 
