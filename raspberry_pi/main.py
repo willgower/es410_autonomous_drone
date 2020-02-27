@@ -442,7 +442,6 @@ if test == "logging":
     try:
         drone = DroneControl()
     except ValueError as error:
-        print("got here")
         print(error)
         sys.exit()
     else:

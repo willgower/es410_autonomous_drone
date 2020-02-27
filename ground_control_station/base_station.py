@@ -3,18 +3,20 @@
 # File: base_station.py
 # Description: File to run locally on a laptop acting as the ground control station.
 
-from ground_control_station.drone_communication import DroneComms  # hmm odd behaviour regarding folder name
+from ground_control_station.drone_communication import DroneComms
 import sys
 import os
 import json
 import time
 
+test = "logging"  # mission, logging
+
 
 def wait_for_message(message):
     """
-	prints messages from drone until specified message is received
-	does not print specified message
-	"""
+    prints messages from drone until specified message is received
+    does not print specified message
+    """
     while True:
         received = drone.read_message()
         if received != message and received is not None:
@@ -39,8 +41,8 @@ def get_response(prompt):
 
 def clear():
     """
-	clear command line issue command based on os
-	"""
+    clear command line issue command based on os
+    """
     if sys.platform == 'win32':
         os.system('cls')
     elif sys.platform == 'linux':
@@ -53,7 +55,7 @@ def abort_setup():
     clear()
 
 
-if __name__ == "__main__":
+if test == "mission":
     while True:
         # === DRONE STATE: INITIALISING ===
         # trying to connect to drone
@@ -204,3 +206,6 @@ if __name__ == "__main__":
 
     # after while loop, exit program
     quit()
+
+if test == "logging":
+    wait_for_message()
