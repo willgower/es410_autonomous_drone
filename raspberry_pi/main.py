@@ -62,7 +62,7 @@ class DroneControl:
             raise ValueError("Failed to communicate with Micro Controller")
 
         self.logger = DataLogging()
-        self.vision = LandingVision()
+        # self.vision = LandingVision()
 
         self.red_led = LED(17)
         self.button = Button(26)
