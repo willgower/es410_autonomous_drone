@@ -30,31 +30,31 @@ class LandingVision:
         self.condition = Condition()
 
     def sift_detector(self, new_image, image_template):
-        # Function that compares input image to template
-        # It then returns the number of SIFT matches between them
+        # function that compares input image to template
+        # it then returns the number of SIFT matches between them
         image1 = cv2.cvtColor(new_image, cv2.COLOR_BGR2GRAY)
         image2 = image_template
 
-        # Create SIFT detector object
+        # create SIFT detector object
         sift = cv2.xfeatures2d.SIFT_create()
 
-        # Obtain the keypoints and descriptors using SIFT
+        # obtain the keypoints and descriptors using SIFT
         keypoints_1, descriptors_1 = sift.detectAndCompute(image1, None)
         keypoints_2, descriptors_2 = sift.detectAndCompute(image2, None)
 
-        # Define parameters for our Flann Matcher
+        # define parameters for our Flann Matcher
         FLANN_INDEX_KDTREE = 0
         index_params = dict(algorithm=FLANN_INDEX_KDTREE, trees=3)
         search_params = dict(checks=100)
 
-        # Create the Flann Matcher object
+        # create the Flann Matcher object
         flann = cv2.FlannBasedMatcher(index_params, search_params)
 
-        # Obtain matches using K-Nearest Neighbor Method
+        # obtain matches using K-Nearest Neighbor Method
         # the result 'matchs' is the number of similar matches found in both images
         matches = flann.knnMatch(descriptors_1, descriptors_2, k=2)
 
-        # Store good matches using Lowe's ratio test
+        # store good matches using Lowe's ratio test
         good_matches = []
         for m, n in matches:
             if m.distance < 0.7 * n.distance:
@@ -72,46 +72,42 @@ class LandingVision:
         # allow the camera to warmup
         time.sleep(0.1)
 
-        # Load our image template, this is our reference image - the drone logo
+        # load our image template, this is our reference image - the drone logo
         image_template = cv2.imread('DroneLogo.png',0) 
 
         while True:
-            # Get webcam images
+            # get webcam images
             ret, frame = cap.read()
 
-            # Get height and width of webcam frame
+            # get height and width of webcam frame
             height, width = frame.shape[:2]
 
-            # Define ROI Box Dimensions
-            #top_left_x = int (width / 3)
-            #top_left_y = int ((height / 2) + (height / 4))
-            #bottom_right_x = int ((width / 3) * 2)
-            #bottom_right_y = int ((height / 2) - (height / 4))
+            # define ROI Box Dimensions
             top_left_x = width
             top_left_y = height
             bottom_right_x = 0
             bottom_right_y = 0
 
-            # Draw rectangular window for our region of interest   
+            # draw rectangular window for our region of interest   
             window = cv2.rectangle(frame, (top_left_x,top_left_y), (bottom_right_x,bottom_right_y), 255, 0)
 
-            # Get number of SIFT matches
+            # get number of SIFT matches
             matches = sift_detector(window, image_template)
 
-            # Display status string showing the current no. of matches 
+            # display status string showing the current no. of matches 
             cv2.putText(frame,str(matches),(450,450), cv2.FONT_HERSHEY_COMPLEX, 2,(0,255,0),1)
 
-            # Our threshold to indicate object deteciton
-            # We use 10 since the SIFT detector returns little false positves
+            # our threshold to indicate object deteciton
+            # using 90 to reduce false positives
             threshold = 90
             
-            #determine pixel and actual dimensions
+            # determine pixel and actual dimensions
             Horizontal_FOV = 62.2 #horizontal angular field of view
             Vertical_FOV = 48.8 #vertical angular field of view
             actualHorizontal = math.tan(math.radians(Horizontal_FOV/2))*altitude*2 #FOV in metres
             actualVertical = math.tan(math.radians(Horizontal_FOV/2))*altitude*2 #FOV in metres
 
-            # If matches exceed our threshold then logo has been detected
+            # if matches exceed the threshold then logo has been detected
             if matches > threshold:
 
                 # define the lower and upper boundaries of the "red object"
@@ -157,18 +153,18 @@ class LandingVision:
                 # update the points queue
                 pts.appendleft(center)
 
-                #calculate the x,y coordinates from the centre of field of view to centre of logo
+                # calculate the x,y coordinates from the centre of field of view to centre of logo
                 x_logo = center[0]
                 y_logo = center[1]
                 x_coordinate = (width/2) - x_logo
                 y_coordinate = (height/2) - y_logo
                 logo_coordinates = [x_coordinate, y_coordinate]
                 
-                #determine distances to travel in each direction
+                # determine distances to travel in each direction
                 x_vel = (x_coordinate/width) * actualHorizontal
                 y_vel = (y_coordinate/height) * actualVertical
                 
-                #initiate landing when drone is centered on landing zone logo
+                # initiate landing when drone is centered on landing zone logo
                 while logo_coordinates == [0, 0]:
                     altitude -= 0.5
 
