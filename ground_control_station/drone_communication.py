@@ -19,13 +19,13 @@ class DroneComms:
 			self.ser = serial.Serial(
 				"/dev/serial/by-id/usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_0001-if00-port0",
 				baudrate=9600,
-				timeout=0.2)
+				timeout=0.05)
 		elif socket.gethostname() == "JAMESHPLAPTOP":
 			# Start a serial connection with James' laptop
 			self.ser = serial.Serial(
 				input("Enter COM port that the HC-12 has been assigned eg. COM4: "),
 				baudrate=9600,
-				timeout=0)
+				timeout=0.05)
 		else:
 			raise ValueError("Who's laptop is this running on?")
 
