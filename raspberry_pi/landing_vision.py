@@ -187,7 +187,4 @@ class LandingVision:
                 # if the `q` key was pressed, break from the loop
                 if key == ord("q"):
 
-        cap.release()
-        cv2.destroyAllWindows()
-
         return x_vel, y_vel, yaw_vel
