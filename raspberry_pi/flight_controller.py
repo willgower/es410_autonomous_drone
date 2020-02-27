@@ -97,7 +97,7 @@ class FlightController:
             "Location lon": str(self.vehicle.location.global_frame.lon),
             "Location alt": str(self.vehicle.location.global_frame.alt),
             "Range Finder Height": str(self.vehicle.rangefinder),
-            "Distance to waypoint": str(0),
+            "Distance to waypoint": self.get_distance_left(),
             "Velocity": str(self.vehicle.velocity),
             "Displacement": str(0),
             "Battery": str(self.vehicle.battery.voltage),
@@ -143,12 +143,15 @@ class FlightController:
         """
         Return the horizontal distance to the next waypoint
         """
-        lat = self.mission_lat
-        lon = self.mission_lon
-        alt = self.mission_height
-        mission_location = dronekit.LocationGlobalRelative(lat, lon, alt)
+        try:
+            lat = self.mission_lat
+            lon = self.mission_lon
+            alt = self.mission_height
+            mission_location = dronekit.LocationGlobalRelative(lat, lon, alt)
 
-        return get_distance_metres(self.vehicle.location.global_frame, mission_location)
+            return get_distance_metres(self.vehicle.location.global_frame, mission_location)
+        except:
+            return "No distance data"
 
     def get_altitude(self):
         """

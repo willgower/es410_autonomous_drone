@@ -6,6 +6,7 @@
 import serial
 import socket
 import calendar
+import time
 
 
 class DroneComms:
@@ -43,6 +44,7 @@ class DroneComms:
 			if received == "drone_online":
 				# Drone is online so send a response that GCS is too
 				epoch_string = str(calendar.timegm(time.localtime()))
+				print("Responding: " + "gcs_online&" + epoch_string)
 				self.send_message("gcs_online&" + epoch_string)
 			elif received == "Handshake complete.":
 				handshake_complete = True
@@ -81,8 +83,6 @@ class DroneComms:
 
 
 if __name__ == "__main__":
-	import time
-
 	drone = DroneComms()
 	counter = 0
 

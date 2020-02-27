@@ -62,7 +62,8 @@ if test == "mission":
         print("Trying to connect to drone...")
         try:
             drone = DroneComms()
-        except:
+        except Exception as e:
+            print(e)
             print("Failed to connect to drone. Would you like to try again?")
             response = input("Response (y/n): ")
             if response == 'y':
@@ -208,4 +209,31 @@ if test == "mission":
     quit()
 
 if test == "logging":
-    wait_for_message()
+    while True:
+        # === DRONE STATE: INITIALISING ===
+        # trying to connect to drone
+        print("Trying to connect to drone...")
+        drone = DroneComms()
+        try:
+            pass
+        except:
+
+            print("Failed to connect to drone. Would you like to try again?")
+            response = input("Response (y/n): ")
+            if response == 'y':
+                continue
+            elif response == 'n':
+                break
+        else:
+            print("Connection established. Waiting for drone to initialise...")
+
+        # waiting for initialisation to be complete
+        wait_for_message("Initialisation successful.")
+        print("Drone Initialisation Complete.\n")
+        break
+
+    while True:
+        # === DRONE STATE: IDLE ===
+        received = drone.read_message()
+        if received is not None:
+            print(received)
