@@ -7,7 +7,7 @@ from flight_controller import FlightController
 from ground_communication import GroundControlStation
 from micro_controller import MicroController
 from data_logging import DataLogging
-from landing_vision import LandingVision
+# from landing_vision import LandingVision
 from recurring_timer import RecurringTimer
 
 import sys
