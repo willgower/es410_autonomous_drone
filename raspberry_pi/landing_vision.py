@@ -12,6 +12,10 @@
 # → Formatting and edit for use on RPi by Will
 # =====================================
 
+import io
+from picamera.array import PiRGBArray
+from picamera import PiCamera
+import time
 from collections import deque
 import imutils
 import cv2
@@ -19,9 +23,9 @@ import cv2
 
 class LandingVision:
     def __init__(self):
-        """
-        over to you Aaron...
-        """
+        self.frame = None
+        self.buffer = io.BytesIO()
+        self.condition = Condition()
 
     def sift_detector(self, new_image, image_template):
         # Function that compares input image to template
@@ -57,7 +61,15 @@ class LandingVision:
         return len(good_matches)
 
     def get_instruction(self, altitude):
-        cap = cv2.VideoCapture(0)
+        while altitude > 
+        # initialize the camera and grab a reference to the raw camera capture
+        camera = PiCamera()
+        camera.resolution = (640, 480)
+        camera.framerate = 32
+        cap = PiRGBArray(camera, size=(640, 480))
+        
+        # allow the camera to warmup
+        time.sleep(0.1)
 
         # Load our image template, this is our reference image - the drone logo
         image_template = cv2.imread('DroneLogo.png',0) 
@@ -144,9 +156,16 @@ class LandingVision:
                 #calculate the x,y coordinates from the centre of field of view to centre of logo
                 x_logo = center[0]
                 y_logo = center[1]
-                x_vel = (width/2) - x_logo
-                y_vel = (height/2) - y_logo
-                logo_coordinates = [x_vel, y_vel]
+                x_coordinate = (width/2) - x_logo
+                y_coordinate = (height/2) - y_logo
+                logo_coordinates = [x_coordinate, y_coordinate]
+                
+                #determine pixel and actual dimensions
+                
+                
+                #initiate landing when drone is centered on landing zone logo
+                while logo_coordinates == [0, 0]:
+                    altitude -= 0.5
 
                 # loop over the set of tracked points
                 for i in range(1, len(pts)):
@@ -154,9 +173,18 @@ class LandingVision:
                 # them
                     if pts[i - 1] is None or pts[i] is None:
                             continue
-            cv2.imshow('Logo Tracker', frame)
-            if cv2.waitKey(1) == 13: #13 is the Enter Key
-                break
+            # capture frames from the camera
+            for frame in camera.capture_continuous(cap, format="bgr", use_video_port=True):
+                # grab the raw NumPy array representing the image, then initialize the timestamp
+                # and occupied/unoccupied text
+                image = frame.array
+                # show the frame
+                cv2.imshow("Frame", image)
+                key = cv2.waitKey(1) & 0xFF
+                # clear the stream in preparation for the next frame
+                cap.truncate(0)
+                # if the `q` key was pressed, break from the loop
+                if key == ord("q"):
 
         cap.release()
         cv2.destroyAllWindows()
