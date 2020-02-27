@@ -74,7 +74,7 @@ class DroneControl:
         # Setting up class attributes
         self.abortFlag = None
         self.emergency_land = False
-        self.state = None
+        self.state = ""
         self.received_mission = None
         self.mission_title = "Default mission name"
 
@@ -304,16 +304,10 @@ class DroneControl:
 
         self.logger.log_info(current, fc_stats)
 
-        message = "State: " + self.state
-
-        if fc_stats["Location alt"] is not None:
-            message += "Altitude :" + fc_stats["Location alt"]
-
-        if fc_stats["Distance to waypoint"] is not None:
-            message += "Distance to waypoint :" + fc_stats["Distance to waypoint"]
-
-        if fc_stats["Battery"] is not None:
-            message += "Battery Voltage (mV): " + fc_stats["Battery"]
+        message = "State: " + self.state \
+                  + "Altitude :" + fc_stats["Location alt"] \
+                  + "Distance to waypoint :" + fc_stats["Distance to waypoint"] \
+                  + "Battery Voltage (mV): " + fc_stats["Battery"]
 
         self.report(message)
 
