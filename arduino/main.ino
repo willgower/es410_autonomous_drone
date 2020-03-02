@@ -1,66 +1,85 @@
+const int EN = 12;
+const int PWM2 = 11;
+const int PWM1 = 10;
+const int OCC = 9;
 const int analogInPin = A0;
 
 int sensorValue = 0;
 float outputVoltage = 0;
 float current = 0;
 
-const int PWM1 = 3;
-const int EN = 4;
-const int PWM2 = 5;
-
-
 void setup()
 {
-  Serial.begin(9600);
                         //set all pins as output
+  Serial.begin(9600);
+  pinMode(EN, OUTPUT);
   pinMode(PWM1, OUTPUT);
   pinMode(PWM2, OUTPUT);
-  pinMode(EN, OUTPUT);
+  pinMode(OCC, OUTPUT);
 }
 
-void loop()
+void loop(mode)
 {
-  sensorValue = analogRead(analogInPin);
-  outputVoltage = (sensorValue / 1023.0) * 5.0;
-  current = outputVoltage * 50; // 20mV/A
-
-  Serial.println(current);
+  if (mode == 0) {
+                        //Mode 0 means the arduino is awaiting instruction. It sets
+                        //both PWM signals to low so the motor is not driven.
+    digitalWrite(EN, LOW);
+    digitalWrite(PWM1, LOW);
+    digitalWrite(PWM2, LOW);
+    digitalWrite(OCC, HIGH);
+                        //wait 200ms
+    delay(200);
+  }
   
-  delay(200);
-                        //drive forward at full speed by pulling PWM1 High
-                        //and PWM2 low, while writing a full 255 to EN to
-                        //control speed
-  digitalWrite(PWM1, HIGH);
-  digitalWrite(PWM2, LOW);
-  analogWrite(EN, 255);
+  if (mode == 1) {
+                        //Mode 1 measures current through the motor. It reads the
+                        //value of the sensor and calculates the output voltage to
+                        //then calculate the current being drawn from the motor
+    sensorValue = analogRead(analogInPin);
+    outputVoltage = (sensorValue / 1023.0) * 5.0;
+    current = outputVoltage * 50; // 20mV/A
 
-                        //wait 1 second
-  delay(1000);
+    Serial.println(current);
+                        //wait 200ms
+    delay(200);
+  }
+  
+  if (mode == 2) {
+                        //Mode 2 closes the grippers. It drives the motor
+                        //forward at full speed by pulling PWM1 High and
+                        //PWM2 low, while setting EN to high.
+    digitalWrite(EN, HIGH);
+    digitalWrite(PWM1, HIGH);
+    digitalWrite(PWM2, LOW);
+    digitalWrite(OCC, LOW);
 
-                        //Brake the motor by pulling both direction pins to
-                        //the same state (in this case LOW). PWMA doesn't matter
-                        //in a brake situation, but set as 0.
-  digitalWrite(PWM1, LOW);
-  digitalWrite(PWM2, LOW);
-  analogWrite(EN, 0);
+  
+                        //wait 200ms
+    delay(200);
+    if (current > 60) {
+                        //Stop motor if current gets too high
+                        //since higher current means more pressure
+                        //is applied to the payload.
+      mode = 0
+      digitalWrite(EN, LOW);
+      digitalWrite(PWM1, LOW);
+      digitalWrite(PWM2, LOW);
+      digitalWrite(OCC, HIGH);
 
-                        //wait 1 second
-  delay(1000);
+    }
+  }
+  
+  if (mode == 3) {
+                        //Mode 3 opens the grippers. It pulls PWM2 high and PWM1
+                        //low, so the states are reversed thus the direction
+                        //of motor rotation reverses to open the grippers.
+    digitalWrite(EN, HIGH);
+    digitalWrite(PWM1, LOW);
+    digitalWrite(PWM2, HIGH);
+    digitalWrite(OCC, LOW);
 
-                        //change direction to reverse by flipping the states
-                        //of the direction pins from their forward state
-  digitalWrite(PWM1, LOW);
-  digitalWrite(PWM2, HIGH);
-  analogWrite(EN, 150);
-
-                        //wait 1 second
-  delay(1000);
-
-                        //Brake again
-  digitalWrite(PWM1, LOW);
-  digitalWrite(PWM2, LOW);
-  analogWrite(EN, 0);
-
-                        //wait 1 second
-  delay(1000);
+  
+                        //wait 200ms
+    delay(200);
+  }
 }
