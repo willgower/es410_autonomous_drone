@@ -56,9 +56,9 @@ void loop(mode)
   
                         //wait 200ms
     delay(200);
-    if (current > 60) {
-                        //Stop motor if current gets too high
-                        //since higher current means more pressure
+    if (current < 75) {
+                        //Stop motor if current gets too low
+                        //since reduced current means more pressure
                         //is applied to the payload.
       mode = 0
       digitalWrite(EN, LOW);
