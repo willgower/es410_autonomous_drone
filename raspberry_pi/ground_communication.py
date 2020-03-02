@@ -27,7 +27,7 @@ class GroundControlStation:
         self.yellow_led.on()
 
         # Start handshake procedure
-        handshake_complete = False
+        handshake_complete = True
 
         while not handshake_complete:
             self.ser.write("drone_online\n".encode('utf-8'))
