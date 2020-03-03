@@ -35,7 +35,6 @@ class DroneControl:
             "logging_interval": 0.1
         }
 
-        """
         self.green_led = PWMLED(22)
         self.green_led.pulse(fade_in_time=0.5,
                              fade_out_time=0.5)  # Pulse the green LED constantly while script is running
@@ -48,7 +47,6 @@ class DroneControl:
             # if fail to open link to GCS no means of reporting so enter specific sequence
             self.alert_initialisation_failure()
             raise ValueError("Failed to communicate with Ground Control Station")
-        """
 
         self.fc = FlightController()
         if self.fc.initSuccessful:
@@ -57,7 +55,6 @@ class DroneControl:
             self.report("Link to FC failed")
             raise ValueError("Failed to communicate with Flight Controller")
 
-        """
         self.uC = MicroController()
         if self.uC.initSuccessful:
             self.report("Link to uC established")
@@ -74,7 +71,7 @@ class DroneControl:
         self.button.when_held = self.__prepare_exit
 
         self.scheduler = RecurringTimer(self.parameters["logging_interval"], self.__monitor_flight)
-        """
+
         # Setting up class attributes
         self.abortFlag = None
         self.emergency_land = False
