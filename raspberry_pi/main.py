@@ -38,7 +38,6 @@ class DroneControl:
         self.green_led = PWMLED(22)
         self.green_led.pulse(fade_in_time=0.5,
                              fade_out_time=0.5)  # Pulse the green LED constantly while script is running
-        
 
         self.gcs = GroundControlStation()
         if self.gcs.initSuccessful:

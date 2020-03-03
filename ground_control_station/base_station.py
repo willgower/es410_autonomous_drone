@@ -135,7 +135,7 @@ if test == "mission":
             # send "mission" to put drone in state ready to receive mission details
             drone.send_message("mission")
             # send mission details
-            drone.send_message("str_mission")
+            drone.send_message(str_mission)
 
             print("Mission sent. Drone is processing the mission. Please wait.")
             wait_for_message("Mission processing finished.")
