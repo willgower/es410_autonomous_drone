@@ -17,7 +17,7 @@ import os
 from datetime import datetime as dt
 from gpiozero import Button, LED, PWMLED
 
-test = "logging"  # 'logging', 'take off' or 'mission'
+test = "take off"  # 'logging', 'take off' or 'mission'
 
 
 class DroneControl:
@@ -35,9 +35,11 @@ class DroneControl:
             "logging_interval": 0.1
         }
 
+        """
         self.green_led = PWMLED(22)
         self.green_led.pulse(fade_in_time=0.5,
                              fade_out_time=0.5)  # Pulse the green LED constantly while script is running
+        
 
         self.gcs = GroundControlStation()
         if self.gcs.initSuccessful:
@@ -46,6 +48,7 @@ class DroneControl:
             # if fail to open link to GCS no means of reporting so enter specific sequence
             self.alert_initialisation_failure()
             raise ValueError("Failed to communicate with Ground Control Station")
+        """
 
         self.fc = FlightController()
         if self.fc.initSuccessful:
@@ -54,13 +57,14 @@ class DroneControl:
             self.report("Link to FC failed")
             raise ValueError("Failed to communicate with Flight Controller")
 
+        """
         self.uC = MicroController()
         if self.uC.initSuccessful:
             self.report("Link to uC established")
         else:
             self.report("Link to uC failed")
             raise ValueError("Failed to communicate with Micro Controller")
-
+        
         self.logger = DataLogging()
         # self.vision = LandingVision()
 
@@ -70,7 +74,7 @@ class DroneControl:
         self.button.when_held = self.__prepare_exit
 
         self.scheduler = RecurringTimer(self.parameters["logging_interval"], self.__monitor_flight)
-
+        """
         # Setting up class attributes
         self.abortFlag = None
         self.emergency_land = False
@@ -90,14 +94,14 @@ class DroneControl:
         """
         method to directly report a message to GCS
         """
-        self.gcs.send_message(message)
-        print(message)
+        # self.gcs.send_message(message)
+        print("\033[1;32;40m " + message)
 
     def abort(self):
         """
         called at any time and will reset drone so in idle state
         """
-        self.red_led.blink(on_time=0.1, off_time=0.1, n=25)  # Flash red for 5 seconds while going back to idle
+        # self.red_led.blink(on_time=0.1, off_time=0.1, n=25)  # Flash red for 5 seconds while going back to idle
         self.report("Aborting mission...")
         self.abortFlag = True
         self.report("Mission abort successful.")
