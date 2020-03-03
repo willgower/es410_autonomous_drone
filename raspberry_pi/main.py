@@ -91,8 +91,8 @@ class DroneControl:
         """
         method to directly report a message to GCS
         """
-        # self.gcs.send_message(message)
-        print("\033[1;32;40m " + message)
+        self.gcs.send_message(message)
+        print(message)
 
     def abort(self):
         """
@@ -225,6 +225,7 @@ class DroneControl:
         timeout after 30 s
         """
         self.report("Waiting for authorisation to fly.")
+        self.report("Reply \"takeoff\"")
 
         # wait for message authorising flight - timeout 30 s
         timeout = 30
