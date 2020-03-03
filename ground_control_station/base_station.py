@@ -9,7 +9,7 @@ import os
 import json
 import time
 
-test = "logging"  # mission, logging
+test = "mission"  # mission, logging
 
 
 def wait_for_message(message):

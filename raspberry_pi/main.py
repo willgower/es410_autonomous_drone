@@ -17,7 +17,7 @@ import os
 from datetime import datetime as dt
 from gpiozero import Button, LED, PWMLED
 
-test = "take off"  # 'logging', 'take off' or 'mission'
+test = "mission"  # 'logging', 'take off' or 'mission'
 
 
 class DroneControl:
