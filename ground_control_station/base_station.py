@@ -128,7 +128,7 @@ if test == "mission":
             # store values in a dictionary then send encoded as json
             mission = {"title": input("  Mission Title: "),
                        "location": input("  Mission destination: "),
-                       "altitude": int(input("  Mission altitude"))}
+                       "altitude": int(input("  Mission altitude: "))}
 
             # encode mission as json
             str_mission = json.dumps(mission)
