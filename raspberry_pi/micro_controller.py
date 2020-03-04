@@ -32,7 +32,7 @@ class MicroController:
                 2 - enable parcel load (grippers closing)
                 3 - open grippers
         """
-        self.ser.write(str(mode))
+        self.ser.write(str(mode).encode('utf-8'))
 
     def is_parcel_loaded(self):
         """
