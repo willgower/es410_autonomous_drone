@@ -101,7 +101,7 @@ class FlightController:
             "Location lon": str(self.vehicle.location.global_frame.lon),
             "Location alt": str(self.vehicle.location.global_relative_frame.alt),
             "Range Finder Height": str(self.vehicle.rangefinder),
-            "Distance to waypoint": self.get_distance_left(),
+            "Distance to waypoint": str(self.get_distance_left()),
             "Velocity": str(self.vehicle.velocity),
             "Displacement": str(0),
             "Battery": str(self.vehicle.battery.voltage),
