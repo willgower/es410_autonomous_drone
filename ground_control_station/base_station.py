@@ -12,18 +12,20 @@ import time
 test = "mission"  # mission, logging
 
 
-def wait_for_message(message):
+def wait_for_message(message, failed=None):
     """
     prints messages from drone until specified message is received
     does not print specified message
     """
     while True:
         rec = drone.read_message()
-        if rec != message and rec is not None:
+        if rec != message and rec != failed and rec is not None:
             print("   Message from drone: " + rec)
         elif rec == message:
             # return without printing anything
-            return
+            return True
+        elif rec == failed:
+            return False
 
 
 def verify(action):
@@ -164,8 +166,11 @@ if test == "mission":
 
         # === DRONE STATE: CHECK DRONE IS ARMABLE ===
         print("Checking drone is armable.")
-        wait_for_message("Drone ready to arm.")
-        print("Drone is ready to arm. \n")
+        if wait_for_message("Drone ready to arm.", "Arming check failed."):
+            print("Drone is ready to arm. \n")
+        else:
+            print("Arming check failed.")
+            continue
 
         """ CURRENTLY NOT BEING USED
         # === DRONE STATE: WAITING FOR HWSS ===
