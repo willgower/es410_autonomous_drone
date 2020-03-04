@@ -44,8 +44,8 @@ class FlightController:
         with open(os.path.dirname(os.path.abspath(__file__)) + '/locations.txt', 'r') as file:
             for line in file.readlines():
                 name = line[:line.find(":")].strip()
-                lat = line[line.find(":") + 2:line.find(",")].strip()
-                long = line[line.find(",") + 1:].strip()
+                lat = float(line[line.find(":") + 2:line.find(",")].strip())
+                long = float(line[line.find(",") + 1:].strip())
                 self.locations[name] = (lat, long)
 
         self.mission_lat = None
