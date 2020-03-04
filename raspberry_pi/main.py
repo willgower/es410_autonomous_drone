@@ -183,7 +183,6 @@ class DroneControl:
         """
         Waits for button press to start parcel load
         """
-
         # Wait for the button to be pressed
         self.button.wait_for_press()
 
@@ -194,7 +193,7 @@ class DroneControl:
         if self.uC.is_parcel_loaded():
             self.report("Parcel loaded.")
         else:
-            self.report("Error loading Parcel.")
+            self.report("Failed to load parcel.")
             self.abort()
 
     def check_armable(self):
@@ -323,10 +322,9 @@ class DroneControl:
         the mission will be executed using previously defined functions
         """
         #
-        # some stuff here
+        # Set home location as mission
         #
-        prev_title = self.mission_title
-        self.mission_title = prev_title + "_return"
+        self.mission_title += "_return"
 
     def shutdown(self):
         """

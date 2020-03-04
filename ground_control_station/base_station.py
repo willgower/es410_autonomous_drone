@@ -12,7 +12,7 @@ import time
 test = "mission"  # mission, logging
 
 
-def wait_for_message(message, failed=None):
+def wait_for_message(message, failed="None"):
     """
     prints messages from drone until specified message is received
     does not print specified message
@@ -151,7 +151,7 @@ if test == "mission":
         if response == 'y':
             drone.send_message("battery secured")
             wait_for_message("Battery loaded.")
-            print("Battery load complete. \n")
+            print("Battery load complete.\n")
         elif response == 'n':
             abort_setup()
             continue  # go back to idle state
@@ -161,15 +161,18 @@ if test == "mission":
 
         # === DRONE STATE: PARCEL LOADING ===
         print("Please hold parcel underneath drone and press button to close the grippers.")
-        wait_for_message("Parcel loaded.")
-        print("Parcel successfully loaded.\n")
+        if wait_for_message("Parcel loaded.", "Failed to load parcel."):
+            print("Parcel successfully loaded.\n")
+        else:
+            print("Failed to load parcel.\n")
+            continue
 
         # === DRONE STATE: CHECK DRONE IS ARMABLE ===
         print("Checking drone is armable.")
         if wait_for_message("Drone ready to arm.", "Arming check failed."):
-            print("Drone is ready to arm. \n")
+            print("Drone is ready to arm.\n")
         else:
-            print("Arming check failed.")
+            print("Arming check failed.\n")
             continue
 
         """ CURRENTLY NOT BEING USED
