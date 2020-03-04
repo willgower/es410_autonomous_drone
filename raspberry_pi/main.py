@@ -204,10 +204,10 @@ class DroneControl:
         # verify mission uploaded?
 
         if not self.fc.get_armmable_status():
+            self.report("Drone ready to arm.")
+        else:
             self.report("Arming check failed.")
             self.abort()
-        else:
-            self.report("Drone ready to arm.")
 
     def wait_for_flight_authorisation(self):
         """
@@ -240,16 +240,18 @@ class DroneControl:
         self.logger.prepare_for_logging(self.mission_title)
         self.scheduler.start()
 
-        self.report("Drone is taking off...")
-        self.fc.begin_flight()
-        self.report("Drone has taken off.")
+        self.report("Drone is arming and taking off...")
+        self.state = "Arming"
+        self.fc.arm()
 
         # loop until drone is almost at traverse altitude
         self.state = "Ascending"
+        self.fc.start_ascending()
         while self.fc.get_altitude() < self.parameters["traverse_alt"] * 0.95:
             time.sleep(0.1)
 
-        # loop until drone is almost at traverse altitude
+        # loop until drone is within 5m of destination
+        self.fc.fly_to_destination()
         self.state = "Traversing"
         while self.fc.get_distance_left() > 5:
             time.sleep(0.1)

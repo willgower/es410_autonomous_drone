@@ -119,9 +119,10 @@ class FlightController:
         """
         return self.vehicle.is_armable
 
-    def begin_flight(self):
+    def arm(self):
         """
-        Run the take off and mission starting commands.
+        Arm the drone
+        This is a blocking function
         """
         # Drone should arm in GUIDED mode
         self.vehicle.mode = "GUIDED"
@@ -130,9 +131,14 @@ class FlightController:
         while not self.vehicle.armed:
             time.sleep(1)
 
+    def start_ascending(self):
+        """
+        Actually takeoff
+        This is a non blocking function
+        """
         self.vehicle.simple_takeoff(self.mission_height)
 
-    def fly_to_location(self):
+    def fly_to_destination(self):
         """
         Start the traversing stage of flight
         """

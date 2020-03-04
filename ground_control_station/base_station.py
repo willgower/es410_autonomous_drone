@@ -160,16 +160,19 @@ if test == "mission":
         # === DRONE STATE: PARCEL LOADING ===
         print("Please hold parcel underneath drone and press button to close the grippers.")
         wait_for_message("Parcel loaded.")
+        print("Parcel successfully loaded.\n")
 
         # === DRONE STATE: CHECK DRONE IS ARMABLE ===
         print("Checking drone is armable.")
         wait_for_message("Drone ready to arm.")
         print("Drone is ready to arm. \n")
 
+        """ CURRENTLY NOT BEING USED
         # === DRONE STATE: WAITING FOR HWSS ===
         print("Please press the hardware safety switch.")
         wait_for_message("Switch pressed.")
         print("Switch pressed. Pausing to allow all people to withdraw to a safe distance. \n")
+        """
 
         # === DRONE STATE: WAITING FOR FLIGHT AUTHORISATION ===
         wait_for_message("Waiting for authorisation to fly.")
