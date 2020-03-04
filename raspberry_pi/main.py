@@ -246,7 +246,8 @@ class DroneControl:
         # loop until drone is almost at traverse altitude
         self.state = "Ascending"
         self.fc.start_ascending()
-        while self.fc.get_altitude() < self.parameters["traverse_alt"] * 0.95:
+        while self.fc.get_altitude() < self.fc.mission_height * 0.95:
+            print(str(self.fc.get_altitude()) + " vs required altitude " + str(self.fc.mission_height * 0.95))
             time.sleep(0.1)
 
         # loop until drone is within 5m of destination
