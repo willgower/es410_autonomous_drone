@@ -81,7 +81,7 @@ class FlightController:
         """
         Returns true or false if the battery is connected
         """
-        if 10 < self.vehicle.battery < 20:  # When no battery the battery voltage comes out to be around 0.7V
+        if 10 < self.vehicle.battery.voltage < 20:  # When no battery the battery voltage comes out to be around 0.7V
             return True
         else:
             return False
