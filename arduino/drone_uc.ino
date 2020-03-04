@@ -1,3 +1,9 @@
+// ES410 Autonomous Drone
+// Owner: Aaron Sodhi
+// File: drone_uc.ino
+// Description: Module to control gripper system and report battery current back to RPi
+
+
 /////////////////////////////////////////////
 //               Constants                 //
 /////////////////////////////////////////////
