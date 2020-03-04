@@ -143,11 +143,15 @@ class DroneControl:
         """
         Processes the received mission
         """
-        self.mission_title = self.received_mission["title"]
-        self.fc.set_destination(self.received_mission["location"])
-        self.fc.mission_height = int(self.received_mission["altitude"])
-
-        self.report("Mission processing finished.")
+        try:
+            self.mission_title = self.received_mission["title"]
+            self.fc.set_destination(self.received_mission["location"])
+            self.fc.mission_height = int(self.received_mission["altitude"])
+        except:
+            self.report("Error processing mission, aborting.")
+            self.abortFlag = True
+        else:
+            self.report("Mission processing finished.")
 
     def battery_load(self):
         """
@@ -198,12 +202,7 @@ class DroneControl:
         do necessary checks to determine if drone is ready to arm
         note, hardware safety switch is pressed after this
         """
-
-        # What other checks should be done?
-        # verify battery and package load?
-        # verify mission uploaded?
-
-        if not self.fc.get_armmable_status():
+        if self.fc.get_armmable_status():
             self.report("Drone ready to arm.")
         else:
             self.report("Arming check failed.")
