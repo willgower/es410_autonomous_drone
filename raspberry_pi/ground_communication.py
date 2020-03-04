@@ -64,7 +64,7 @@ class GroundControlStation:
         message_length = self.ser.in_waiting
 
         if message_length > 0:
-            message = self.ser.readline().decode().strip()
+            message = self.ser.readline().decode('utf-8').strip()
         else:
             message = None
 
