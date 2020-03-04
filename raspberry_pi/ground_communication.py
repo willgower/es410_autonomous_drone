@@ -28,6 +28,7 @@ class GroundControlStation:
 
         # Start handshake procedure
         handshake_complete = False
+        print("Starting Handshake procedure with GCS")
 
         while not handshake_complete:
             self.ser.write("drone_online\n".encode('utf-8'))
