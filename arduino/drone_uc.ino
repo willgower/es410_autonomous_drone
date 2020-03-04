@@ -58,7 +58,7 @@ void openGrippers() {
   digitalWrite(PWM2, HIGH);
   digitalWrite(OCC, LOW);
   
-    while (torque < 75) { // This should really be a much lower threshold
+    while (torque < 50) { // This is dependent on the torque constant being reduced as the motor begins to grip package
     // Stay in this loop while the grippers open up to the end stoppers
     continue;
   }
@@ -77,7 +77,7 @@ void closeGrippers() {
   digitalWrite(PWM2, LOW);
   digitalWrite(OCC, LOW);
   
-  while (torque < 75) {
+  while (torque < 50) {
     // Stay in this loop while the grippers close in around the box
     continue;
   }
