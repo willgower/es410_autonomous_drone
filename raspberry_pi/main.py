@@ -174,32 +174,23 @@ class DroneControl:
                 break
         else:
             self.report("Battery secured confirmation not received within 20 seconds.")
-            self.abort()
 
     def parcel_load(self):
         """
-        loops until parcel is loaded
-        on entry, enable parcel load
-        check if parcel is loaded
-        on exit, disable parcel load
-        timeout after 30 s
+        Waits for button press to start parcel load
         """
 
-        # open grippers to accept parcel
-        self.uC.open_grippers()
-        # put in parcel loading mode
-        self.uC.set_mode(2)
+        # Wait for the button to be pressed
+        self.button.wait_for_press()
 
-        # wait until parcel is loaded - timeout 30 s
-        self.report("Waiting for parcel to be loaded.")
-        timeout = 30
-        start = time.perf_counter()
-        while time.perf_counter() - start < timeout:
-            if self.uC.is_parcel_loaded():
-                self.report("Parcel loaded.")
-                break
+        # This function is blocking
+        self.report("Closing grippers")
+        self.uC.close_grippers()
+
+        if self.uC.is_parcel_loaded():
+            self.report("Parcel loaded.")
         else:
-            self.report("Parcel not loaded within " + str(timeout) + " seconds.")
+            self.report("Error loading Parcel.")
             self.abort()
 
     def check_armable(self):

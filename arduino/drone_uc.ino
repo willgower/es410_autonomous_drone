@@ -133,7 +133,8 @@ void loop() {
     
     // This function is blocking and will return when they are closed
     closeGrippers();
-    
+
+    Serial.println("grippers_closed");
     // Return to IDLE state
     mode = 0;
   }
@@ -143,7 +144,8 @@ void loop() {
     
     // This function is blocking and will return when they are opened
     openGrippers();
-    
+
+    Serial.println("grippers_opened");
     // Return to IDLE state
     mode = 0;
   }
