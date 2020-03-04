@@ -234,7 +234,6 @@ class DroneControl:
         report to base
         continue when loiter point reached
         """
-
         # Start data logging
         self.logger.prepare_for_logging(self.mission_title)
         self.scheduler.start()
@@ -247,7 +246,6 @@ class DroneControl:
         self.state = "Ascending"
         self.fc.start_ascending()
         while self.fc.get_altitude() < self.fc.mission_height * 0.95:
-            print(str(self.fc.get_altitude()) + " vs required altitude " + str(self.fc.mission_height * 0.95))
             time.sleep(0.1)
 
         # loop until drone is within 5m of destination
@@ -259,15 +257,15 @@ class DroneControl:
         # descend
         self.fc.change_flight_mode("AUTO")
         self.state = "Descending"
-        alt = self.fc.get_altitude()
-        while alt > 2:
+        current_alt = self.fc.get_altitude()
+        while current_alt > 2:
             # use vision system for guidance
-            x_vel, y_vel, yaw_vel = self.vision.get_instruction(alt)
+            x_vel, y_vel, yaw_vel = 0, 0, 0  # self.vision.get_instruction(current_alt)
             z_vel = self.parameters["descent_vel"]
             self.fc.move_relative(x_vel, y_vel, z_vel, 0)
             # so drone not at angle when picture taken
             time.sleep(1)
-            alt = self.fc.get_altitude()
+            current_alt = self.fc.get_altitude()
 
         # land
         self.state = "Landing"
@@ -295,7 +293,7 @@ class DroneControl:
 
         # get details to log
         fc_stats = self.fc.get_fc_stats()
-        current = self.uC.get_current()
+        current = self.fc.vehicle.battery.current  # self.uC.get_current()
 
         self.logger.log_info(current, fc_stats)
 
