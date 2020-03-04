@@ -99,7 +99,7 @@ class FlightController:
         fc_data = {
             "Location lat": str(self.vehicle.location.global_frame.lat),
             "Location lon": str(self.vehicle.location.global_frame.lon),
-            "Location alt": str(self.vehicle.location.global_frame.alt),
+            "Location alt": str(self.vehicle.location.global_relative_frame.alt),
             "Range Finder Height": str(self.vehicle.rangefinder),
             "Distance to waypoint": self.get_distance_left(),
             "Velocity": str(self.vehicle.velocity),

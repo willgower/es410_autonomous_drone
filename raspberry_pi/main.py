@@ -300,9 +300,10 @@ class DroneControl:
 
         if self.reporting_count % 10 == 0:
             message = "State: " + self.state \
-                      + "  |  Altitude: " + fc_stats["Location alt"].ljust(5) \
+                      + "  |  Altitude: " + fc_stats["Location alt"].ljust(6) \
                       + "  |  Distance to waypoint: " + fc_stats["Distance to waypoint"] \
-                      + "  |  Battery Voltage (mV): " + fc_stats["Battery"].ljust(5) \
+                      + "  |  Groundspeed: " + fc_stats["Groundspeed"].ljust(5) \
+                      + "  |  Battery Voltage (V): " + fc_stats["Battery"].ljust(5) \
                       + "  |  Current (A): " + str(current).ljust(5)
 
             self.report(message)
