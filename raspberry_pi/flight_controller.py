@@ -167,7 +167,7 @@ class FlightController:
         """
         Returns the current flight altitude as an integer
         """
-        return int(self.vehicle.location.global_frame.alt)
+        return self.vehicle.location.global_relative_frame.alt
 
     def change_flight_mode(self, flight_mode):
         """
