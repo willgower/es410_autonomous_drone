@@ -57,7 +57,7 @@ void currentSense() {
   sensorValue = analogRead(OCM);
   voltage = (sensorValue / 1023.0) * 5.0;
   currentmA = (voltage / 220) * 1000; //220 Ohm resistor between OCM and GND
-  Serial.println(current);
+  Serial.println(currentmA);
 }
 
 void openGrippers() {
