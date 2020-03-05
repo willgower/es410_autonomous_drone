@@ -177,8 +177,6 @@ class LandingVision:
             # grab the raw NumPy array representing the image, then initialize the timestamp
             # and occupied/unoccupied text
             image = frame.array
-            # show the frame
-            cv2.imshow("Frame", image)
             key = cv2.waitKey(1) & 0xFF
             # clear the stream in preparation for the next frame
             cap.truncate(0)
