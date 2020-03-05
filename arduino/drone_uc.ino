@@ -23,7 +23,7 @@ int torque;
 const int analogInPin = A0;
 int sensorValue = 0;
 float outputVoltage = 0;
-float current = 0;
+float currentmA = 0;
 
 /////////////////////////////////////////////
 //                 Set Up                  //
@@ -56,7 +56,7 @@ void currentSense() {
 
   sensorValue = analogRead(OCM);
   voltage = (sensorValue / 1023.0) * 5.0;
-  current = (voltage / 220) * 1000; //220 Ohm resistor between OCM and GND
+  currentmA = (voltage / 220) * 1000; //220 Ohm resistor between OCM and GND
   Serial.println(current);
 }
 
