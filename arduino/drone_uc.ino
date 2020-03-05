@@ -12,9 +12,9 @@
 int mode = 0;
 
 // Motor current sensing for force detection
-const int EN = 12;
-const int PWM2 = 11;
-const int PWM1 = 10;
+const int EN = 11;
+const int PWM2 = 10;
+const int PWM1 = 9;
 const int OCM = A1;
 
 // Large Battery Current Sensing for energy logging
