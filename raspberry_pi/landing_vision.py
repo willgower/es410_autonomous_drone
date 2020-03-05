@@ -11,7 +11,7 @@
 #   the get_instruction() method
 # → Formatting and edit for use on RPi by Will
 # =====================================
-
+"""
 import io
 import picamera.array
 from picamera import PiCamera
@@ -185,3 +185,4 @@ class LandingVision:
                 break
 
         return x_vel, y_vel, yaw_vel
+"""
