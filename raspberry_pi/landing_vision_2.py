@@ -5,6 +5,11 @@
 
 import cv2
 import numpy as np
+import socket
+if socket.gethostname() != "william-XPS-13-9360":
+    from picamera.array import PiRGBArray
+    from picamera import PiCamera
+import time
 
 
 class LandingVision:
@@ -19,7 +24,16 @@ class LandingVision:
         self.max_features = 100
         self.good_match_percent = 0.1
 
-    def get_offset(self, ground_in, altitide):
+        if socket.gethostname() != "william-XPS-13-9360":
+            self.camera = PiCamera()
+
+    def take_picture(self):
+        raw_capture = PiRGBArray(self.camera)
+        time.sleep(0.1)
+        self.camera.capture(raw_capture, format="bgr")
+        return raw_capture.array
+
+    def get_offset(self, altitide, ground_in=None, test=False):
         """
         Take the current altitude as input.
         Use this and image recognition to determine the horizontal displacement
@@ -27,8 +41,12 @@ class LandingVision:
         Return this displacement in cartesian coordinates where 0, 0 represents
         the drone being directly over the target.
         """
-        # Convert images to grayscale
-        ground_grey = cv2.cvtColor(ground_in, cv2.COLOR_BGR2GRAY)
+        if ground_in is None:
+            # Take a picture using the Pi Camera here
+            ground_grey = cv2.cvtColor(self.take_picture(), cv2.COLOR_BGR2GRAY)
+        else:
+            # Convert images to grayscale
+            ground_grey = cv2.cvtColor(ground_in, cv2.COLOR_BGR2GRAY)
 
         # Detect ORB features and compute descriptors.
         orb = cv2.ORB_create(self.max_features)
@@ -54,10 +72,11 @@ class LandingVision:
 
         average = points1.mean(0, int)
 
-        mid = cv2.circle(ground, (average[0], average[1]), 50, (255, 0, 0), -1)
-        cv2.line(mid, (0, int(ground.shape[0] / 2)), (ground.shape[1], int(ground.shape[0] / 2)), (255, 255, 255), 10)
-        cv2.line(mid, (int(ground.shape[1] / 2), 0), (int(ground.shape[1] / 2), ground.shape[0]), (255, 255, 255), 10)
-        cv2.imwrite("images/located.jpg", mid)
+        if test:
+            mid = cv2.circle(ground, (average[0], average[1]), 50, (255, 0, 0), -1)
+            cv2.line(mid, (0, int(ground.shape[0] / 2)), (ground.shape[1], int(ground.shape[0] / 2)), (255, 255, 255), 10)
+            cv2.line(mid, (int(ground.shape[1] / 2), 0), (int(ground.shape[1] / 2), ground.shape[0]), (255, 255, 255), 10)
+            cv2.imwrite("images/located.jpg", mid)
 
         coords = [int(average[0] - ground.shape[1] / 2), int(ground.shape[0] / 2 - average[1])]
 
@@ -71,7 +90,7 @@ if __name__ == '__main__':
     vision = LandingVision()
 
     # Ground image to search within
-    ground = cv2.imread("images/large_image_4.jpeg", cv2.IMREAD_COLOR)
+    ground = cv2.imread("images/large_image.jpeg", cv2.IMREAD_COLOR)
 
-    offset = vision.get_offset(ground, 20)
+    offset = vision.get_offset(20, ground, test=True)
     print(offset)

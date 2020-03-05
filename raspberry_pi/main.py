@@ -7,7 +7,7 @@ from flight_controller import FlightController
 from ground_communication import GroundControlStation
 from micro_controller import MicroController
 from data_logging import DataLogging
-# from landing_vision import LandingVision
+from landing_vision_2 import LandingVision
 from recurring_timer import RecurringTimer
 
 import sys
@@ -62,7 +62,7 @@ class DroneControl:
             raise ValueError("Failed to communicate with Micro Controller")
         
         self.logger = DataLogging()
-        # self.vision = LandingVision()
+        self.vision = LandingVision()
 
         self.red_led = LED(17)
         self.button = Button(26)
@@ -259,7 +259,7 @@ class DroneControl:
         current_alt = self.fc.get_altitude()
         while current_alt > 2:
             # use vision system for guidance
-            x_vel, y_vel, yaw_vel = 0, 0, 0  # self.vision.get_instruction(current_alt)
+            x_vel, y_vel = self.vision.get_offset(current_alt)
             z_vel = self.parameters["descent_vel"]
             self.fc.move_relative(x_vel, y_vel, z_vel, 0)
             # so drone not at angle when picture taken
