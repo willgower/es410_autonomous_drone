@@ -16,6 +16,7 @@ const int EN = 12;
 const int PWM2 = 11;
 const int PWM1 = 10;
 const int OCC = 9;
+const int OCM = A1;
 int torque;
 
 // Large Battery Current Sensing for energy logging
@@ -34,6 +35,7 @@ void setup() {
   pinMode(PWM2, OUTPUT);
   pinMode(OCC, OUTPUT);
   pinMode(analogInPin, INPUT);
+  pinMode(OCM, INPUT);
   
   Serial.begin(9600);
   
@@ -47,6 +49,17 @@ void setup() {
 //          Function Definitions           //
 /////////////////////////////////////////////
 
+void currentSense() {
+  // Code here to sense the current in the motor
+
+  //Reads the current from the analog pin
+
+  sensorValue = analogRead(OCM);
+  voltage = (sensorValue / 1023.0) * 5.0;
+  current = (voltage / 220) * 1000; //220 Ohm resistor between OCM and GND
+  Serial.println(current);
+}
+
 void openGrippers() {
   // Code here to open the grippers
   
@@ -58,7 +71,7 @@ void openGrippers() {
   digitalWrite(PWM2, HIGH);
   digitalWrite(OCC, LOW);
   
-    while (torque < 50) { // This is dependent on the torque constant being reduced as the motor begins to grip package
+    while (currentmA < 65) { // Current threshold is 65mA
     // Stay in this loop while the grippers open up to the end stoppers
     continue;
   }
@@ -77,7 +90,7 @@ void closeGrippers() {
   digitalWrite(PWM2, LOW);
   digitalWrite(OCC, LOW);
   
-  while (torque < 50) {
+  while (curentmA < 65) {
     // Stay in this loop while the grippers close in around the box
     continue;
   }
