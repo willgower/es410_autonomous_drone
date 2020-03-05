@@ -130,16 +130,16 @@ void loop() {
     
     // This function is blocking and will return when they are closed
     closeGrippers();
-    while (grip_curr < 0.2) {
+    float grip_curr = 0; //initialise lower than threshold
     int OCM_read = analogRead(OCM);
     float OCM_volt = (OCM_read / 1023.0) * 5.0;
     grip_curr = OCM_volt / 0.5; // 20mV/A
     Serial.println(grip_curr);
+    while (grip_curr > 0.2) {
+      stopGrippers();
     }
 
     Serial.println("grippers_closed");
-    stopGrippers();
-    Serial.println("Grippers stopped");
     delay(1000);
     // Return to IDLE state
     mode = 0;
