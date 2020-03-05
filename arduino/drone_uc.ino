@@ -12,17 +12,17 @@
 int mode = 0;
 
 // Motor current sensing for force detection
-const int EN = 12;
-const int PWM2 = 11;
-const int PWM1 = 10;
-const int OCC = 9;
+const int EN = 11;
+const int PWM2 = 10;
+const int PWM1 = 9;
 const int OCM = A1;
 
 // Large Battery Current Sensing for energy logging
 const int analogInPin = A0;
 int sensorValue = 0;
 float outputVoltage = 0;
-float currentmA = 0;
+float current = 0;
+float grip_curr = 0; //initialise lower than threshold
 
 /////////////////////////////////////////////
 //                 Set Up                  //
@@ -32,7 +32,6 @@ void setup() {
   pinMode(EN, OUTPUT);
   pinMode(PWM1, OUTPUT);
   pinMode(PWM2, OUTPUT);
-  pinMode(OCC, OUTPUT);
   pinMode(analogInPin, INPUT);
   pinMode(OCM, INPUT);
   
@@ -48,17 +47,6 @@ void setup() {
 //          Function Definitions           //
 /////////////////////////////////////////////
 
-void currentSense() {
-  // Code here to sense the current in the motor
-
-  //Reads the current from the analog pin
-
-  sensorValue = analogRead(OCM);
-  outputVoltage = (sensorValue / 1023.0) * 5.0;
-  currentmA = (outputVoltage / 220) * 1000;
-  Serial.println(currentmA);
-}
-
 void openGrippers() {
   // Code here to open the grippers
   
@@ -68,9 +56,8 @@ void openGrippers() {
   digitalWrite(EN, HIGH);
   digitalWrite(PWM1, LOW);
   digitalWrite(PWM2, HIGH);
-  digitalWrite(OCC, LOW);
   
-    while (currentmA < 65) { // Current threshold is 65mA
+    while (grip_curr < 0.15) { // Current threshold is 0.15mA
     // Stay in this loop while the grippers open up to the end stoppers
     continue;
   }
@@ -87,9 +74,8 @@ void closeGrippers() {
   digitalWrite(EN, HIGH);
   digitalWrite(PWM1, HIGH);
   digitalWrite(PWM2, LOW);
-  digitalWrite(OCC, LOW);
   
-  while (currentmA < 65) {
+  while (grip_curr < 0.15) {
     // Stay in this loop while the grippers close in around the box
     continue;
   }
@@ -105,7 +91,6 @@ void stopGrippers() {
   digitalWrite(EN, LOW);
   digitalWrite(PWM1, LOW);
   digitalWrite(PWM2, LOW);
-  digitalWrite(OCC, HIGH);
 }
 
 /////////////////////////////////////////////
@@ -117,7 +102,6 @@ void loop() {
     // read the incoming number
     mode = Serial.parseInt();
   }
-  
   if (mode == 0) {
     // Mode 0 means the arduino is awaiting instruction
     
@@ -131,13 +115,14 @@ void loop() {
     // Mode 1 measures current through the motor. It reads the
     // value of the sensor and calculates the output voltage to
     // then calculate the current being drawn from the motor
-    sensorValue = analogRead(analogInPin);
-    outputVoltage = (sensorValue / 1023.0) * 5.0;
-    currentmA = outputVoltage * 50; // 20mV/A
-    Serial.println(currentmA);
+    int OCM_read = analogRead(OCM);
+    float OCM_volt = (OCM_read / 1023.0) * 5.0;
+    grip_curr = OCM_volt / 0.5; // 20mV/A
+    Serial.println(grip_curr);
+  delay(1000);
     
-    // wait 2ms
-    delay(2);
+  // wait 2ms
+  delay(2);
   }
   else if (mode == 2)
   {
@@ -145,8 +130,17 @@ void loop() {
     
     // This function is blocking and will return when they are closed
     closeGrippers();
+    float grip_curr = 0; //initialise lower than threshold
+    int OCM_read = analogRead(OCM);
+    float OCM_volt = (OCM_read / 1023.0) * 5.0;
+    grip_curr = OCM_volt / 0.5; // 20mV/A
+    Serial.println(grip_curr);
+    while (grip_curr > 0.2) {
+      stopGrippers();
+    }
 
     Serial.println("grippers_closed");
+    delay(1000);
     // Return to IDLE state
     mode = 0;
   }
