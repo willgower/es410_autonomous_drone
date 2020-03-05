@@ -18,7 +18,7 @@ class LandingVision:
         Initialise camera and class attributes
         """
         # Landing image to search for
-        self.landing_logo = cv2.imread("images/small_landing_image.png", cv2.IMREAD_COLOR)
+        self.landing_logo = cv2.imread("images/landing_image.png", cv2.IMREAD_COLOR)
         self.landing_logo_grey = cv2.cvtColor(self.landing_logo, cv2.COLOR_BGR2GRAY)
 
         self.max_features = 100
@@ -33,7 +33,7 @@ class LandingVision:
         self.camera.capture(raw_capture, format="bgr")
         return raw_capture.array
 
-    def get_offset(self, altitide, ground_in=None, test=False):
+    def get_offset(self, altitide, ground_in=None, test=None):
         """
         Take the current altitude as input.
         Use this and image recognition to determine the horizontal displacement
@@ -72,11 +72,11 @@ class LandingVision:
 
         average = points1.mean(0, int)
 
-        if test:
+        if test is not None:
             mid = cv2.circle(ground, (average[0], average[1]), 50, (255, 0, 0), -1)
             cv2.line(mid, (0, int(ground.shape[0] / 2)), (ground.shape[1], int(ground.shape[0] / 2)), (255, 255, 255), 10)
             cv2.line(mid, (int(ground.shape[1] / 2), 0), (int(ground.shape[1] / 2), ground.shape[0]), (255, 255, 255), 10)
-            cv2.imwrite("images/located.jpg", mid)
+            cv2.imwrite("images/located_" + test + ".jpg", mid)
 
         coords = [int(average[0] - ground.shape[1] / 2), int(ground.shape[0] / 2 - average[1])]
 
@@ -89,8 +89,9 @@ class LandingVision:
 if __name__ == '__main__':
     vision = LandingVision()
 
-    # Ground image to search within
-    ground = cv2.imread("images/large_image.jpeg", cv2.IMREAD_COLOR)
+    for i in "1", "2", "3", "4":
+        # Ground image to search within
+        ground = cv2.imread("images/large_image_" + i + ".jpeg", cv2.IMREAD_COLOR)
 
-    offset = vision.get_offset(20, ground, test=True)
-    print(offset)
+        offset = vision.get_offset(20, ground, test=i)
+        print(offset)
