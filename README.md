@@ -10,6 +10,12 @@ Raspberry Pi
 - flight_controller.py
 - micro_controller.py
 - data_logger.py
+- recurring_timer.py
+- locations.txt
+    - Logging
+        - CSV flight data files
+    - Images
+        - Images used for landing vision
     
 Arduino
 - drone_uc.ino
@@ -21,7 +27,7 @@ Ground Control Station
 # User Guide
 
 ## Drone
-_mostly written for the benefit of whoever writes the GCS code (aka: me)_
+_Describes the high level behaviour of the Drone._
 
 #### LED Colour Codes
 | Colour | Behaviour | Description |
