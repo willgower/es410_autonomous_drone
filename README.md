@@ -3,22 +3,9 @@ Warwick Engineering ES410 Group Project - Group 13
 
 Repository to contain all of the code across 3 devices:
 
-Raspberry Pi
-- main.py
-- landing_vision.py
-- ground_communication.py
-- flight_controller.py
-- micro_controller.py
-- data_logger.py
-- recurring_timer.py
-- locations.txt
-    
-Arduino
-- drone_uc.ino
-    
-Ground Control Station
-- base_station.py
-- drone_communication.py
+Raspberry Pi - the on board companion computer
+Arduino - the on board microcontroller
+Ground Control Station - a laptop based on the ground
 
 # User Guide
 
