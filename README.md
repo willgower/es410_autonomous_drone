@@ -4,7 +4,9 @@ Warwick Engineering ES410 Group Project - Group 13
 Repository to contain all of the code across 3 devices:
 
 Raspberry Pi - the on board companion computer
+
 Arduino - the on board microcontroller
+
 Ground Control Station - a laptop based on the ground
 
 # User Guide
