@@ -12,7 +12,7 @@ Raspberry Pi
 - data_logger.py
     
 Arduino
-- main.ino
+- drone_uc.ino
     
 Ground Control Station
 - base_station.py
