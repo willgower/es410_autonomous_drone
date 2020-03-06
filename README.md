@@ -12,10 +12,6 @@ Raspberry Pi
 - data_logger.py
 - recurring_timer.py
 - locations.txt
-    - Logging
-        - CSV flight data files
-    - Images
-        - Images used for landing vision
     
 Arduino
 - drone_uc.ino
