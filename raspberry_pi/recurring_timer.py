@@ -1,4 +1,9 @@
-# thanks to MestreLion https://stackoverflow.com/a/13151299
+# ES410 Autonomous Drone
+# Owner: James Bennett
+# File: recurring_timer.py
+# Description: Sets up a repeated function call
+
+# Thanks to MestreLion https://stackoverflow.com/a/13151299
 from threading import Timer
 
 
