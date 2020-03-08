@@ -211,7 +211,7 @@ if test == "mission":
             abort_setup()
             continue  # go back to idle state
         else:  # problem
-            print("Problem. This shouldn't have happend. Quitting.")
+            print("Problem. This shouldn't have happened. Quitting.")
             sys.exit()
 
         # === DRONE STATE: FLYING ===
