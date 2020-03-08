@@ -17,15 +17,14 @@ class FlightController:
         Start MAVLink connection to the Pixhawk
         Set flag for successful initialisation
         """
-        self.initSuccessful = False  # Assume connection fails
+        self.initSuccessful = False  # Assume that the connection fails
 
         try:
             # There is no timeout on this connection becoming available meaning that the
             # RPi and Pixhawk must be plugged together as the companion computer boots
-            self.vehicle = dronekit.connect(  # '/dev/serial/by-id/usb-ArduPilot_fmuv2_390030000E51373337333031-if00',
-                                            'udp:192.168.0.48:14550',   # IP address of the Pi with the
-                                                                        # port that the pymavlink is routing to
-                                            # heartbeat_timeout=5,
+            self.vehicle = dronekit.connect('/dev/serial/by-id/usb-ArduPilot_fmuv2_390030000E51373337333031-if00',
+                                            # 'udp:192.168.0.48:14550', SITL connection - this it the IP address
+                                            # of the Pi with the port that the pymavlink is routing to
                                             wait_ready=True)
         except OSError:  # Bad TTY connection
             print('No serial exists!')
@@ -38,8 +37,10 @@ class FlightController:
         else:
             self.initSuccessful = True
 
-        self.vehicle.mode = 'GUIDED'  # Set the default vehicle mode
+        # Set the default vehicle mode
+        self.vehicle.mode = 'GUIDED'
 
+        # Extract all the GPS delivery locations from the text file and save them in a dictionary
         self.locations = {}
         with open(os.path.dirname(os.path.abspath(__file__)) + '/locations.txt', 'r') as file:
             for line in file.readlines():
@@ -48,10 +49,10 @@ class FlightController:
                 long = float(line[line.find(",") + 1:].strip())
                 self.locations[name] = (lat, long)
 
+        # Define class attributes
         self.mission_lat = None
         self.mission_lon = None
-
-        self.mission_height = 10  # Height that the drone will fly to and traverse at
+        self.mission_height = 10
 
     def set_destination(self, location):
         """
@@ -64,12 +65,13 @@ class FlightController:
     def land(self):
         """
         Land the drone in the exact position.
+        This function is non blocking
         """
         self.vehicle.mode = "LAND"
 
     def is_drone_at_destination(self):
         """
-        please return true or false
+        Return true or false
         this is to allow drone to go into guided state
         """
         if self.get_distance_left() < 5:  # Ensure the drone is within 5 metres of target location
@@ -103,26 +105,24 @@ class FlightController:
             "Range Finder Height": str(self.vehicle.rangefinder),
             "Distance to waypoint": str(self.get_distance_left()),
             "Velocity": str(self.vehicle.velocity),
-            "Displacement": str(0),
             "Battery": str(self.vehicle.battery.voltage),
             "Groundspeed": str(self.vehicle.groundspeed),
             "Airspeed": str(self.vehicle.airspeed)
         }
-
-        # fc_data_encoded = json.JSONEncoder().encode(fc_data)
 
         return fc_data
 
     def get_armmable_status(self):
         """
         Return whether or not the drone is armable.
+        i.e. have all pre flight checks been passed?
         """
         return self.vehicle.is_armable
 
     def arm(self):
         """
         Arm the drone
-        This is a blocking function
+        This is a blocking function and will only return when the drone is armed
         """
         # Drone should arm in GUIDED mode
         self.vehicle.mode = "GUIDED"
@@ -134,7 +134,7 @@ class FlightController:
     def start_ascending(self):
         """
         Actually takeoff
-        This is a non blocking function
+        This is a non blocking function that will be monitored in main.py
         """
         self.vehicle.simple_takeoff(self.mission_height)
 
@@ -173,7 +173,7 @@ class FlightController:
         """
         Change between auto mission mode and guided 'joystick' mode.
         """
-        if flight_mode in ["AUTO", "GUIDED", "LOITER"]:
+        if flight_mode in ["AUTO", "GUIDED", "LOITER", "LAND"]:
             self.vehicle.mode = flight_mode
         else:
             print("Invalid flight mode sent")
@@ -182,6 +182,7 @@ class FlightController:
         """
         Provide low level 'joystick style' commands to the drone.
         """
+        # Construct the MAVLink message
         msg = self.vehicle.message_factory.set_position_target_local_ned_encode(
             0,                                              # time_boot_ms (not used)
             0, 0,                                           # target_system, target_component
@@ -212,6 +213,10 @@ def get_distance_metres(location_1, location_2):
     dlong = location_2.lon - location_1.lon
     return math.sqrt((dlat * dlat) + (dlong * dlong)) * 1.113195e5
 
+
+########################################
+#           MODULE TESTBENCH           #
+########################################
 
 if __name__ == "__main__":
     fc = FlightController()
