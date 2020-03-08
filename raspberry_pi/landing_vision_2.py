@@ -24,6 +24,9 @@ class LandingVision:
         self.max_features = 100
         self.good_match_percent = 0.1
 
+        self.orb = cv2.ORB_create(self.max_features)
+        self.keypoints2, self.descriptors2 = self.orb.detectAndCompute(self.landing_logo_grey, None)
+
         if socket.gethostname() != "william-XPS-13-9360":
             self.camera = PiCamera()
 
@@ -49,13 +52,11 @@ class LandingVision:
             ground_grey = cv2.cvtColor(ground_in, cv2.COLOR_BGR2GRAY)
 
         # Detect ORB features and compute descriptors.
-        orb = cv2.ORB_create(self.max_features)
-        keypoints1, descriptors1 = orb.detectAndCompute(ground_grey, None)
-        keypoints2, descriptors2 = orb.detectAndCompute(self.landing_logo_grey, None)
+        keypoints1, descriptors1 = self.orb.detectAndCompute(ground_grey, None)
 
         # Match features.
         matcher = cv2.DescriptorMatcher_create(cv2.DESCRIPTOR_MATCHER_BRUTEFORCE_HAMMING)
-        matches = matcher.match(descriptors1, descriptors2, None)
+        matches = matcher.match(descriptors1, self.descriptors2, None)
 
         # Sort matches by score
         matches.sort(key=lambda x: x.distance, reverse=False)
@@ -70,10 +71,14 @@ class LandingVision:
         for i, match in enumerate(matches):
             points1[i, :] = keypoints1[match.queryIdx].pt
 
-        average = points1.mean(0, int)
+        if len(points1) < 10:
+            print("No matchng image found")
+            return 0, 0  # If image cant be seen, descend vertically to get a closer look
+        else:
+            average = points1.mean(0, int)
 
         if test is not None:
-            mid = cv2.circle(ground, (average[0], average[1]), 50, (255, 0, 0), -1)
+            mid = cv2.circle(ground, (average[0], average[1]), 100, (255, 0, 0), 50)
             cv2.line(mid, (0, int(ground.shape[0] / 2)), (ground.shape[1], int(ground.shape[0] / 2)), (255, 255, 255), 10)
             cv2.line(mid, (int(ground.shape[1] / 2), 0), (int(ground.shape[1] / 2), ground.shape[0]), (255, 255, 255), 10)
             cv2.imwrite("images/located_" + test + ".jpg", mid)
@@ -89,9 +94,9 @@ class LandingVision:
 if __name__ == '__main__':
     vision = LandingVision()
 
-    for i in "1", "2", "3", "4":
+    for i in "1", "2", "3", "4", "5", "6", "7", "8", "9":
         # Ground image to search within
-        ground = cv2.imread("images/large_image_" + i + ".jpeg", cv2.IMREAD_COLOR)
+        ground = cv2.imread("images/test_image_" + i + ".jpeg", cv2.IMREAD_COLOR)
 
         offset = vision.get_offset(20, ground, test=i)
         print(offset)

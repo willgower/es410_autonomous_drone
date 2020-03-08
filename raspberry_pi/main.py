@@ -266,12 +266,14 @@ class DroneControl:
             time.sleep(1)
             current_alt = self.fc.get_altitude()
 
-        # land
+        # Start the landing procedure
         self.state = "Landing"
         self.fc.land()
-        ###########################################
-        # check that land() is blocking from SITL #
-        ###########################################
+
+        # Once the landing procedure has finished the drone will disarm, so wait for this
+        while self.fc.vehicle.armed:
+            drone.report("Drone is landing")
+            time.sleep(1)
 
         drone.report("Drone landed.")
 
