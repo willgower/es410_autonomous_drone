@@ -6,6 +6,8 @@
 import cv2
 import numpy as np
 import socket
+# Only the Raspberry Pi can take pictures
+# Any other computer can still run the testbench
 if socket.gethostname() != "william-XPS-13-9360":
     from picamera.array import PiRGBArray
     from picamera import PiCamera
@@ -21,18 +23,22 @@ class LandingVision:
         self.landing_logo = cv2.imread("images/landing_image.png", cv2.IMREAD_COLOR)
         self.landing_logo_grey = cv2.cvtColor(self.landing_logo, cv2.COLOR_BGR2GRAY)
 
+        # Set up class attributes
         self.max_features = 100
         self.good_match_percent = 0.1
-
-        self.orb = cv2.ORB_create(self.max_features)
-        self.keypoints2, self.descriptors2 = self.orb.detectAndCompute(self.landing_logo_grey, None)
-
         if socket.gethostname() != "william-XPS-13-9360":
             self.camera = PiCamera()
 
+        # Find the features of the landing zone image
+        self.orb = cv2.ORB_create(self.max_features)
+        self.keypoints2, self.descriptors2 = self.orb.detectAndCompute(self.landing_logo_grey, None)
+
     def take_picture(self):
+        """
+        Take a picture using the Raspberry Pi camera and return it as an image array
+        """
         raw_capture = PiRGBArray(self.camera)
-        time.sleep(0.1)
+        time.sleep(0.1)  # Wait for 0.1 seconds for the camera to load
         self.camera.capture(raw_capture, format="bgr")
         return raw_capture.array
 
@@ -51,10 +57,10 @@ class LandingVision:
             # Convert images to grayscale
             ground_grey = cv2.cvtColor(ground_in, cv2.COLOR_BGR2GRAY)
 
-        # Detect ORB features and compute descriptors.
+        # Detect ORB features and compute descriptors
         keypoints1, descriptors1 = self.orb.detectAndCompute(ground_grey, None)
 
-        # Match features.
+        # Match features
         matcher = cv2.DescriptorMatcher_create(cv2.DESCRIPTOR_MATCHER_BRUTEFORCE_HAMMING)
         matches = matcher.match(descriptors1, self.descriptors2, None)
 
@@ -73,23 +79,30 @@ class LandingVision:
 
         if len(points1) < 10:
             print("No matchng image found")
-            return 0, 0  # If image cant be seen, descend vertically to get a closer look
+            return 0, 0  # If image can't be seen, descend vertically to get a closer look
         else:
             average = points1.mean(0, int)
 
+        # Don't save any images under normal operation - only when running the testbench
         if test is not None:
             mid = cv2.circle(ground, (average[0], average[1]), 100, (255, 0, 0), 50)
             cv2.line(mid, (0, int(ground.shape[0] / 2)), (ground.shape[1], int(ground.shape[0] / 2)), (255, 255, 255), 10)
             cv2.line(mid, (int(ground.shape[1] / 2), 0), (int(ground.shape[1] / 2), ground.shape[0]), (255, 255, 255), 10)
             cv2.imwrite("images/located_" + test + ".jpg", mid)
 
+        # Normalise the coordinates so that (0, 0) is the centre of the image and position of the drone
         coords = [int(average[0] - ground.shape[1] / 2), int(ground.shape[0] / 2 - average[1])]
 
+        # Convert the pixels into metres
         x_distance = round((coords[0] / 1296) * altitide * 0.51, 2)
         y_distance = round((coords[1] / 972) * altitide * 0.37, 2)
 
         return x_distance, y_distance
 
+
+########################################
+#           MODULE TESTBENCH           #
+########################################
 
 if __name__ == '__main__':
     vision = LandingVision()
