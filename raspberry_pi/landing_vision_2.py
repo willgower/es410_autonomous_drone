@@ -42,7 +42,7 @@ class LandingVision:
         self.camera.capture(raw_capture, format="bgr")
         return raw_capture.array
 
-    def get_offset(self, altitide, ground_in=None, test=None):
+    def get_offset(self, altitude, ground_in=None, test=None):
         """
         Take the current altitude as input.
         Use this and image recognition to determine the horizontal displacement
@@ -78,7 +78,7 @@ class LandingVision:
             points1[i, :] = keypoints1[match.queryIdx].pt
 
         if len(points1) < 10:
-            print("No matchng image found")
+            print("No matching image found")
             return 0, 0  # If image can't be seen, descend vertically to get a closer look
         else:
             average = points1.mean(0, int)
@@ -94,8 +94,8 @@ class LandingVision:
         coords = [int(average[0] - ground.shape[1] / 2), int(ground.shape[0] / 2 - average[1])]
 
         # Convert the pixels into metres
-        x_distance = round((coords[0] / 1296) * altitide * 0.51, 2)
-        y_distance = round((coords[1] / 972) * altitide * 0.37, 2)
+        x_distance = round((coords[0] / 1296) * altitude * 0.51, 2)
+        y_distance = round((coords[1] / 972) * altitude * 0.37, 2)
 
         return x_distance, y_distance
 
