@@ -3,7 +3,7 @@
 # File: base_station.py
 # Description: File to run locally on a laptop acting as the ground control station.
 
-from ground_control_station.drone_communication import DroneComms
+from drone_communication import DroneComms
 import sys
 import os
 import json
@@ -22,18 +22,24 @@ def wait_for_message(message, failed="None"):
         if rec != message and rec != failed and rec is not None:
             print("   Message from drone: " + rec)
         elif rec == message:
-            # return without printing anything
+            # Return without printing anything
             return True
         elif rec == failed:
             return False
 
 
 def verify(action):
+    """
+    Simply prompt the user to confirm they are sure
+    """
     print("Are you sure you want to " + action + "?")
     return get_response("Response (y/n): ")
 
 
 def get_response(prompt):
+    """
+    Get a yes or no response from the command line
+    """
     ans = input(prompt)
     while ans not in ('y', 'n'):
         print("Response not recognised. Try again.")
@@ -43,7 +49,7 @@ def get_response(prompt):
 
 def clear():
     """
-    clear command line issue command based on os
+    Clear command line issue command based on os
     """
     if sys.platform == 'win32':
         os.system('cls')
@@ -52,6 +58,9 @@ def clear():
 
 
 def abort_setup():
+    """
+    Abort the setup and clear the command line
+    """
     print("\n Aborting setup. Please wait for drone to timeout and be ready to receive a command. \n")
     time.sleep(3)
     clear()
