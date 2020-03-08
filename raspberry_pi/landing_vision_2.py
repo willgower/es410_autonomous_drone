@@ -20,8 +20,8 @@ class LandingVision:
         Initialise camera and class attributes
         """
         # Landing image to search for
-        self.landing_logo = cv2.imread("images/landing_image.png", cv2.IMREAD_COLOR)
-        self.landing_logo_grey = cv2.cvtColor(self.landing_logo, cv2.COLOR_BGR2GRAY)
+        self.target_image = cv2.imread("images/landing_image.png", cv2.IMREAD_COLOR)
+        self.target_image_grey = cv2.cvtColor(self.target_image, cv2.COLOR_BGR2GRAY)
 
         # Set up class attributes
         self.max_features = 100
@@ -31,7 +31,7 @@ class LandingVision:
 
         # Find the features of the landing zone image
         self.orb = cv2.ORB_create(self.max_features)
-        self.keypoints2, self.descriptors2 = self.orb.detectAndCompute(self.landing_logo_grey, None)
+        self.keypoints2, self.descriptors2 = self.orb.detectAndCompute(self.target_image_grey, None)
 
     def take_picture(self):
         """
@@ -107,9 +107,9 @@ class LandingVision:
 if __name__ == '__main__':
     vision = LandingVision()
 
-    for i in "1", "2", "3", "4", "5", "6", "7", "8", "9":
+    for i in "1", "2", "3":
         # Ground image to search within
-        ground = cv2.imread("images/test_image_" + i + ".jpeg", cv2.IMREAD_COLOR)
+        ground = cv2.imread("images/30m_altitude_test_" + i + ".jpg", cv2.IMREAD_COLOR)
 
-        offset = vision.get_offset(20, ground, test=i)
+        offset = vision.get_offset(30, ground, test=i)
         print(offset)
