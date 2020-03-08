@@ -4,13 +4,13 @@
 # Description: Module to handle the logging of in flight data such as current readings against time.
 
 from datetime import datetime as dt
-import json
 import os
 from gpiozero import LED
 
 
 class DataLogging:
     def __init__(self):
+        # Set up class attributes
         self.currently_logging = False
         self.data_file = None
         self.backup_file = None
@@ -33,6 +33,7 @@ class DataLogging:
         # Also create a backup file locally in the logging folder
         self.backup_file = open(os.path.dirname(os.path.abspath(__file__)) + "/logging/" + name + ".csv", "w+")
 
+        # Write the headers of each file
         for file in self.data_file, self.backup_file:
             file.write("Logging started at " + dt.now().strftime("%d-%m-%y at %H:%M:%S\n"))
             file.write("Timestamp, Longitude, Latitude, Altitude, Velocity, Groundspeed, Airspeed, Current, Voltage\n")
@@ -40,7 +41,9 @@ class DataLogging:
     def log_info(self, current, fc_data_in):
         """
         function should save information to a file in appropriate format
+        Inputs contain a string current and a dictionary of data from the FC
         """
+        # Blink the LED quickly whenever data is written to the files
         self.blue_led.blink(on_time=0.05, n=1)
 
         data = {"Timestamp": dt.now().strftime("%H:%M:%S.%f"),
@@ -63,6 +66,7 @@ class DataLogging:
         self.data_file.close()
         self.backup_file.close()
         try:
+            # Unmount the USB stick so that it can be safely removed
             os.system("sudo umount /media/usb_logger")
         except:
             pass
@@ -79,6 +83,7 @@ class DataLogging:
 
 
 def log_random():
+    # A local function for logging random data in the test bench
     data = {"Timestamp": dt.now().strftime("%H:%M:%S.%f"),
             "Location lon": "Location lon",
             "Location lat": "Location lat",
@@ -90,6 +95,10 @@ def log_random():
 
     data_logging.log_info(90, data)
 
+
+########################################
+#           MODULE TESTBENCH           #
+########################################
 
 if __name__ == "__main__":
     from random import randint
