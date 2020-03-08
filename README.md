@@ -2,25 +2,14 @@
 Warwick Engineering ES410 Group Project - Group 13
 
 Repository to contain all of the code across 3 devices:
-
-Raspberry Pi
-- main.py
-- landing_vision.py
-- ground_communication.py
-- flight_controller.py
-- micro_controller.py
-- data_logger.py
-    
-Arduino
-- main.ino
-    
-Ground Control Station
-- base_station.py
+ - Raspberry Pi: the on board companion computer
+ - Arduino: the on board microcontroller
+ - Ground Control Station: a laptop based on the ground
 
 # User Guide
 
 ## Drone
-_mostly written for the benefit of whoever writes the GCS code (aka: me)_
+_Describes the high level behaviour of the Drone._
 
 #### LED Colour Codes
 | Colour | Behaviour | Description |
