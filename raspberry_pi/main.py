@@ -17,7 +17,7 @@ import os
 from datetime import datetime as dt
 from gpiozero import Button, LED, PWMLED
 
-test = "mission"  # 'logging', 'take off' or 'mission'
+test = "mission"  # test mode: 'logging', 'take off' or 'mission'
 
 
 class DroneControl:
@@ -30,14 +30,21 @@ class DroneControl:
 
         # dictionary of flight parameters
         self.parameters = {
-            "traverse_alt": 10,
             "descent_vel": 0.25,
             "logging_interval": 0.1
         }
 
+        # Pulse the green LED constantly while script is running
         self.green_led = PWMLED(22)
-        self.green_led.pulse(fade_in_time=0.5,
-                             fade_out_time=0.5)  # Pulse the green LED constantly while script is running
+        self.green_led.pulse(fade_in_time=0.5, fade_out_time=0.5)
+
+        # Flash the red LED if an error occurs
+        self.red_led = LED(17)
+
+        # If the button is held for 3 seconds then end the script
+        self.button = Button(26)
+        self.button.hold_time = 3
+        self.button.when_held = self.__prepare_exit
 
         self.gcs = GroundControlStation()
         if self.gcs.initSuccessful:
@@ -63,12 +70,6 @@ class DroneControl:
         
         self.logger = DataLogging()
         self.vision = LandingVision()
-
-        self.red_led = LED(17)
-        self.button = Button(26)
-        self.button.hold_time = 3
-        self.button.when_held = self.__prepare_exit
-
         self.scheduler = RecurringTimer(self.parameters["logging_interval"], self.__monitor_flight)
 
         # Setting up class attributes
@@ -97,7 +98,7 @@ class DroneControl:
         """
         called at any time and will reset drone so in idle state
         """
-        # self.red_led.blink(on_time=0.1, off_time=0.1, n=25)  # Flash red for 5 seconds while going back to idle
+        self.red_led.blink(on_time=0.1, off_time=0.1, n=25)  # Flash red for 5 seconds while going back to idle
         self.report("Aborting mission...")
         self.abortFlag = True
         self.report("Mission abort successful.")
@@ -113,15 +114,15 @@ class DroneControl:
         """
         self.report("Drone is idle. Waiting for command.")
 
-        cmd = -1
-        while cmd == -1:
+        command = -1
+        while command == -1:
             # msg will be type None if no message to read
             msg = self.gcs.read_message()
 
             if msg == "shutdown":
-                cmd = 0
+                command = 0
             elif msg == "reboot":
-                cmd = 2
+                command = 2
             elif msg == "mission":
                 # mission command recieved, waiting for mission details.
                 start = time.perf_counter()
@@ -131,17 +132,17 @@ class DroneControl:
                     mission_message = self.gcs.read_message()
                     if mission_message is not None:
                         self.received_mission = json.loads(mission_message)
-                        cmd = 1
+                        command = 1
                         break
                 else:
                     self.report("Wait for mission details timed out after 5 seconds")
                     self.abort()
 
-        return cmd
+        return command
 
     def process_mission(self):
         """
-        Processes the received mission
+        Processes the received mission and set class attributes
         """
         try:
             self.mission_title = self.received_mission["title"]
@@ -241,42 +242,41 @@ class DroneControl:
         self.state = "Arming"
         self.fc.arm()
 
-        # loop until drone is almost at traverse altitude
+        # Loop until the drone is almost at traverse altitude
         self.state = "Ascending"
         self.fc.start_ascending()
         while self.fc.get_altitude() < self.fc.mission_height * 0.95:
             time.sleep(0.1)
 
-        # loop until drone is within 5m of destination
+        # Loop until the drone is within 5m of destination
         self.fc.fly_to_destination()
         self.state = "Traversing"
         while self.fc.get_distance_left() > 5:
             time.sleep(0.1)
 
-        # descend
+        # Loop until the drone is within 2m of ground
         self.fc.change_flight_mode("AUTO")
         self.state = "Descending"
         current_alt = self.fc.get_altitude()
         while current_alt > 2:
-            # use vision system for guidance
+            # Use vision system for guidance
             x_vel, y_vel = self.vision.get_offset(current_alt)
             z_vel = self.parameters["descent_vel"]
             self.fc.move_relative(x_vel, y_vel, z_vel, 0)
-            # so drone not at angle when picture taken
+            # Add a delay so that the drone isn't at an angle when the picture is taken
             time.sleep(1)
             current_alt = self.fc.get_altitude()
 
-        # Start the landing procedure
+        # Loop until the drone has landed and is disarmed
         self.state = "Landing"
-        self.fc.land()
-
-        # Once the landing procedure has finished the drone will disarm, so wait for this
+        self.fc.land()  # This is non blocking
         while self.fc.vehicle.armed:
             drone.report("Drone is landing")
             time.sleep(1)
 
         drone.report("Drone landed.")
 
+        # Stop data logging
         self.scheduler.stop()
         self.logger.finish_logging()
 
@@ -286,18 +286,23 @@ class DroneControl:
         """
 
         if self.gcs.read_message() == "emergency land":
-            while True:
-                self.fc.vehicle.mode = "LAND"
-                self.report("Drone executing emergency landing.")
+            self.fc.vehicle.mode = "LAND"
+            while self.fc.vehicle.armed:
+                self.report("Drone is executing emergency landing.")
                 time.sleep(1)
-            # then go and turn the drone off
+            self.report("Drone has finished emergency landing.")
 
-        # get details to log
+            # Then exit the script so operator can approach and turn off the drone
+            self.__prepare_exit()
+
+        # Get details to log
         fc_stats = self.fc.get_fc_stats()
-        current = self.fc.vehicle.battery.current  # self.uC.get_current()
+        current = self.uC.get_current()  # self.fc.vehicle.battery.current for SITL
 
+        # Send the details to the data logging module
         self.logger.log_info(current, fc_stats)
 
+        # Every second, report the flight stats to the GCS
         if self.reporting_count % 10 == 0:
             message = "State: " + self.state.ljust(10) \
                       + "  |  Altitude: " + fc_stats["Location alt"].ljust(6) \
@@ -323,10 +328,16 @@ class DroneControl:
         mission to return to base
         the mission will be executed using previously defined functions
         """
-        #
-        # Set home location as mission
-        #
-        self.mission_title += "_return"
+        # Define the return mission
+        try:
+            self.mission_title += "_return"
+            self.fc.set_destination("Post Room")
+            # self.fc.mission_height remains the same
+        except:
+            self.report("Error processing return mission, aborting.")
+            self.abortFlag = True
+        else:
+            self.report("Mission processing finished.")
 
     def shutdown(self):
         """
@@ -335,7 +346,8 @@ class DroneControl:
         """
         self.report("Drone is shutting down.")
         self.__prepare_exit()
-        # shutdown raspberry pi
+
+        # Shutdown raspberry pi
         os.system('sudo shutdown now')
 
     def reboot(self):
@@ -345,24 +357,23 @@ class DroneControl:
         """
         self.report("Drone is rebooting.")
         self.__prepare_exit()
-        # reboot raspberry pi
+
+        # Reboot raspberry pi
         os.system('sudo shutdown -r now')
 
     def __prepare_exit(self):
-        print("BUTTON HELD! Closing down")
+        self.report("Button held - preparing script exit.")
 
+        # Allow modules to cleanly close their processes
         self.logger.close()
         self.uC.close()
         self.fc.close()
         self.gcs.close()
 
+        # Safely exit from GPIO usage
         self.green_led.close()
         self.red_led.close()
         self.button.close()
-
-        print("Ending script")
-
-        os._exit(0)
 
 
 if test == "mission":
@@ -488,16 +499,24 @@ if test == "take off":
     # state: wait for take off authorisation
     drone.wait_for_flight_authorisation()
 
-    # === FLYING ===
-    # state: flying
-    drone.fc.vehicle.simple_takeoff(5)
+    # TAKE-OFF TO 3M
+    drone.fc.vehicle.simple_takeoff(3)
 
     alt = drone.fc.get_altitude()
-    while alt < 4.5:
+    while alt < 2.75:
         time.sleep(1)
         drone.report("Still ascending. Current altitude: " + alt)
         alt = drone.fc.get_altitude()
 
-    # Drone has reached target altitude so now land
+    # HOVER FOR 10 SECONDS
+    drone.fc.change_flight_mode("LOITER")
+    for sec in range(10):
+        drone.report("Hovering. Hover time: " + str(sec + 1) + " seconds")
+
+    # LAND
     drone.report("Starting to land")
     drone.fc.land()
+    while drone.fc.vehicle.armed:
+        drone.report("Drone is landing.")
+        time.sleep(1)
+    drone.report("Drone has finished landing.")
