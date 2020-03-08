@@ -12,12 +12,13 @@ import time
 class DroneComms:
 	def __init__(self):
 		"""
-		start wireless serial connection to drone
+		Start wireless serial connection to drone
 		"""
 		if socket.gethostname() == "william-XPS-13-9360":
 			# Start a serial connection with Will's laptop
 			self.ser = serial.Serial(
 				# "/dev/serial/by-id/usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_0001-if00-port0",
+				# Depends which UART -> USB converter is being used
 				'/dev/serial/by-id/usb-Arduino__www.arduino.cc__0043_55739323437351811190-if00',
 				baudrate=9600,
 				timeout=0.05)
@@ -37,6 +38,7 @@ class DroneComms:
 		print("HC-12 Connected - waiting for message from drone")
 
 		while not handshake_complete:
+			# See if a new message is received every 0.5 seconds
 			time.sleep(0.5)
 			received = self.read_message()
 
@@ -49,6 +51,7 @@ class DroneComms:
 				print("Responding: " + "gcs_online&" + epoch_string)
 				self.send_message("gcs_online&" + epoch_string)
 			elif received == "Handshake complete.":
+				# If the handshake is successful this will break the loop
 				handshake_complete = True
 
 	def read_message(self):
@@ -79,10 +82,14 @@ class DroneComms:
 
 	def close(self):
 		"""
-		do we need to close this link from the GCS?
+		Close the serial link to the HC-12 module
 		"""
 		self.ser.close()
 
+
+########################################
+#           MODULE TESTBENCH           #
+########################################
 
 if __name__ == "__main__":
 	drone = DroneComms()
