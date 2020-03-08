@@ -10,11 +10,13 @@ import time
 class MicroController:
     def __init__(self):
         """
-        establish communication to arduino
+        Establish communication to arduino
         Set flag for successful initialisation
         """
         try:
-            self.ser = serial.Serial("/dev/serial/by-id/usb-Arduino_LLC_Arduino_Nano_Every_C2AD5E5651514743594A2020FF054A1D-if00", 9600)  # /dev/ttyACM0
+            # Connect by it's unique serial ID so that is doesn't matter which USB port it is plugged into
+            self.ser = serial.Serial("/dev/serial/by-id/usb-Arduino_LLC_Arduino_Nano_Every"
+                                     "_C2AD5E5651514743594A2020FF054A1D-if00", 9600)
             self.ser.baudrate = 9600
             self.ser.timeout = 0.1
         except:
@@ -42,25 +44,19 @@ class MicroController:
 
     def close_grippers(self):
         """
-        first, set mode to 2
+        First, set mode to 2
         then read serial port in a loop until message that grippers are closed
         """
         self.set_mode(2)
 
-        """
         while self.ser.readline() != "grippers_closed":
             self.ser.reset_input_buffer()
             time.sleep(0.1)
         self.parcel_loaded = True
-        """
-
-        # Mimic this taking 2 seconds for now
-        time.sleep(2)
-        self.parcel_loaded = True
 
     def open_grippers(self):
         """
-        first, set mode to 3
+        First, set mode to 3
         then read serial port in a loop until message that grippers are open
         """
         self.set_mode(3)
@@ -71,11 +67,16 @@ class MicroController:
 
     def get_current(self):
         """
-        when called should return latest current reading
+        When called it should return latest current reading
         """
         try:
+            # Reset the input buffer so that an old reading isn't received
             self.ser.reset_input_buffer()
+
+            # Read a measurement and discard it (as the start could have been discarded when resetting the input buffer
             self.ser.readline()
+
+            # Read the next clean measurement to come through
             read_ser = self.ser.readline().strip().decode('ascii')
         except:
             read_ser = "Failed to get current reading"
@@ -89,3 +90,16 @@ class MicroController:
         """
         self.ser.flush()
         self.ser.close()
+
+
+########################################
+#           MODULE TESTBENCH           #
+########################################
+
+if __name__ == '__main__':
+    arduino = MicroController()
+
+    while True:
+        # Print the current reading every second
+        print(arduino.get_current())
+        time.sleep(1)
