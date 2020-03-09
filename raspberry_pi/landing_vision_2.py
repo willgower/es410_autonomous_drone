@@ -108,8 +108,9 @@ if __name__ == '__main__':
     vision = LandingVision()
 
     for i in range(1, 12):
+        i = str(i).zfill(2)
         # Ground image to search within
-        ground = cv2.imread("images/test_image_" + str(i) + ".jpg", cv2.IMREAD_COLOR)
+        ground = cv2.imread("images/test_image_" + i + ".jpg", cv2.IMREAD_COLOR)
 
-        offset = vision.get_offset(30, ground, test=str(i))
+        offset = vision.get_offset(30, ground, test=i)
         print(offset)
