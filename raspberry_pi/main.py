@@ -260,9 +260,10 @@ class DroneControl:
         current_alt = self.fc.get_altitude()
         while current_alt > 2:
             # Use vision system for guidance
-            x_vel, y_vel = self.vision.get_offset(current_alt)
+            x_vel, y_vel = 1, 2 #  self.vision.get_offset(current_alt)
             z_vel = self.parameters["descent_vel"]
-            self.fc.move_relative(x_vel, y_vel, z_vel, 0)
+            p_gain = 0.2
+            self.fc.move_relative(p_gain * x_vel, p_gain * y_vel, z_vel, 0)
             # Add a delay so that the drone isn't at an angle when the picture is taken
             time.sleep(1)
             current_alt = self.fc.get_altitude()
@@ -306,10 +307,10 @@ class DroneControl:
         if self.reporting_count % 10 == 0:
             message = "State: " + self.state.ljust(10) \
                       + "  |  Altitude: " + fc_stats["Location alt"].ljust(6) \
-                      + "  |  Distance to waypoint: " + str(round(float(fc_stats["Distance to waypoint"]))).ljust(4) \
-                      + "  |  Groundspeed: " + str(round(float(fc_stats["Groundspeed"]), 2)).ljust(5) \
+                      + "  |  Remaining Distance: " + str(round(float(fc_stats["Distance to waypoint"]))).ljust(4) \
+                      + "  |  Speed: " + str(round(float(fc_stats["Groundspeed"]), 2)).ljust(5) \
                       + "  |  Battery Voltage (V): " + fc_stats["Battery"].ljust(5) \
-                      + "  |  Current (A): " + str(round(float(current))).ljust(5)
+                      + "  |  Battery Current (A): " + str(round(float(current))).ljust(5)
 
             self.report(message)
 
