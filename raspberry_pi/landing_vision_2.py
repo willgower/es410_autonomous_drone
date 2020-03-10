@@ -8,7 +8,7 @@ import numpy as np
 import socket
 # Only the Raspberry Pi can take pictures
 # Any other computer can still run the testbench
-if socket.gethostname() != "william-XPS-13-9360":
+if socket.gethostname() == "raspberrypi":
     from picamera.array import PiRGBArray
     from picamera import PiCamera
 import time
@@ -20,13 +20,13 @@ class LandingVision:
         Initialise camera and class attributes
         """
         # Landing image to search for
-        self.target_image = cv2.imread("images/landing_image.png", cv2.IMREAD_COLOR)
+        self.target_image = cv2.imread("/images/landing_image.png", cv2.IMREAD_COLOR)
         self.target_image_grey = cv2.cvtColor(self.target_image, cv2.COLOR_BGR2GRAY)
 
         # Set up class attributes
         self.max_features = 100
         self.good_match_percent = 0.1
-        if socket.gethostname() != "william-XPS-13-9360":
+        if socket.gethostname() == "raspberrypi":
             self.camera = PiCamera()
 
         # Find the features of the landing zone image
