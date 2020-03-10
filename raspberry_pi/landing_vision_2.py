@@ -21,7 +21,8 @@ class LandingVision:
         Initialise camera and class attributes
         """
         # Landing image to search for
-        self.target_image = cv2.imread(os.path.abspath(__file__) + "images/landing_image.png", cv2.IMREAD_COLOR)
+        print("Looking for image at path: " + os.path.abspath('images/landing_image.png'))
+        self.target_image = cv2.imread(os.path.abspath('images/landing_image.png'), cv2.IMREAD_COLOR)
         self.target_image_grey = cv2.cvtColor(self.target_image, cv2.COLOR_BGR2GRAY)
 
         # Set up class attributes
