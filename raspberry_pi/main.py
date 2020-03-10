@@ -297,7 +297,7 @@ class DroneControl:
 
         # Get details to log
         fc_stats = self.fc.get_fc_stats()
-        current = self.uC.get_current()  # self.fc.vehicle.battery.current for SITL
+        current = self.fc.vehicle.battery.current  # self.uC.get_current() for SITL
 
         # Send the details to the data logging module
         self.logger.log_info(current, fc_stats)
