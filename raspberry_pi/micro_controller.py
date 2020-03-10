@@ -49,9 +49,13 @@ class MicroController:
         """
         self.set_mode(2)
 
+        """
         while self.ser.readline() != "grippers_closed":
             self.ser.reset_input_buffer()
             time.sleep(0.1)
+        self.parcel_loaded = True
+        """
+        time.sleep(2)
         self.parcel_loaded = True
 
     def open_grippers(self):
@@ -60,9 +64,14 @@ class MicroController:
         then read serial port in a loop until message that grippers are open
         """
         self.set_mode(3)
+
+        """
         while self.ser.readline() != "grippers_opened":
             self.ser.reset_input_buffer()
             time.sleep(0.1)
+        self.parcel_loaded = False
+        """
+        time.sleep(2)
         self.parcel_loaded = False
 
     def get_current(self):
