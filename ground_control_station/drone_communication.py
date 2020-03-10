@@ -4,7 +4,7 @@
 # Description: Module to handle serial communication to the drone from the GCS
 
 import serial
-import socket
+import platform
 import calendar
 import time
 
@@ -14,22 +14,23 @@ class DroneComms:
 		"""
 		Start wireless serial connection to drone
 		"""
-		if socket.gethostname() == "william-XPS-13-9360":
-			# Start a serial connection with Will's laptop
+		if platform.system() == "Linux":
+			# Start a serial connection on a Linux laptop
 			self.ser = serial.Serial(
 				"/dev/serial/by-id/usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_0001-if00-port0",
 				# Depends which UART -> USB converter is being used
 				# '/dev/serial/by-id/usb-Arduino__www.arduino.cc__0043_55739323437351811190-if00',
 				baudrate=9600,
 				timeout=0.05)
-		elif socket.gethostname() == "JAMESHPLAPTOP":
-			# Start a serial connection with James' laptop
+		elif platform.system() == "Windows":
+			# Start a serial connection with a Windows laptop
 			self.ser = serial.Serial(
 				input("Enter COM port that the HC-12 has been assigned eg. COM4: "),
 				baudrate=9600,
 				timeout=0.05)
 		else:
-			raise ValueError("Who's laptop is this running on?")
+			print("What laptop is this running on?")
+			quit()
 
 		# If an error is encountered here it will be handled in base_station.py
 
