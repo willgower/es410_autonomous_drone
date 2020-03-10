@@ -22,8 +22,10 @@ class FlightController:
         try:
             # There is no timeout on this connection becoming available meaning that the
             # RPi and Pixhawk must be plugged together as the companion computer boots
-            self.vehicle = dronekit.connect('/dev/serial/by-id/usb-ArduPilot_fmuv2_390030000E51373337333031-if00',
-                                            # 'udp:192.168.0.48:14550', SITL connection - this it the IP address
+            self.vehicle = dronekit.connect(
+                                            # '/dev/serial/by-id/usb-ArduPilot_fmuv2_390030000E51373337333031-if00',
+                                            'udp:10.235.1.107:14550',
+                                            # SITL connection - this the IP address
                                             # of the Pi with the port that the pymavlink is routing to
                                             wait_ready=True)
         except OSError:  # Bad TTY connection

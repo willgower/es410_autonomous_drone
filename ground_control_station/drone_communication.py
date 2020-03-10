@@ -17,9 +17,9 @@ class DroneComms:
 		if socket.gethostname() == "william-XPS-13-9360":
 			# Start a serial connection with Will's laptop
 			self.ser = serial.Serial(
-				# "/dev/serial/by-id/usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_0001-if00-port0",
+				"/dev/serial/by-id/usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_0001-if00-port0",
 				# Depends which UART -> USB converter is being used
-				'/dev/serial/by-id/usb-Arduino__www.arduino.cc__0043_55739323437351811190-if00',
+				# '/dev/serial/by-id/usb-Arduino__www.arduino.cc__0043_55739323437351811190-if00',
 				baudrate=9600,
 				timeout=0.05)
 		elif socket.gethostname() == "JAMESHPLAPTOP":
