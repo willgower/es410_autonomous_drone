@@ -139,7 +139,7 @@ if test == "mission":
             # store values in a dictionary then send encoded as json
             mission = {"title": input("  Mission Title: "),
                        "location": input("  Mission destination: "),
-                       "altitude": int(input("  Mission altitude: "))}
+                       "altitude": input("  Mission altitude: ")}
 
             # encode mission as json
             str_mission = json.dumps(mission)
@@ -149,8 +149,11 @@ if test == "mission":
             drone.send_message(str_mission)
 
             print("Mission sent. Drone is processing the mission. Please wait.")
-            wait_for_message("Mission processing finished.")
-            print("Mission upload complete. \n")
+            if wait_for_message("Mission processing finished.", "Error processing mission, aborting."):
+                print("Mission upload complete. \n")
+            else:
+                print("Error processing mission, aborting.")
+                continue
 
         # === DRONE STATE: BATTERY LOADING ===
         print("Please load battery into the drone.")

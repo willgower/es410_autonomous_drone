@@ -260,7 +260,7 @@ class DroneControl:
         current_alt = self.fc.get_altitude()
         while current_alt > 2:
             # Use vision system for guidance
-            x_vel, y_vel = 1, 2 #  self.vision.get_offset(current_alt)
+            x_vel, y_vel = 1, 2  # self.vision.get_offset(current_alt)
             z_vel = self.parameters["descent_vel"]
             p_gain = 0.2
             self.fc.move_relative(p_gain * x_vel, p_gain * y_vel, z_vel, 0)
@@ -442,6 +442,8 @@ if test == "mission":
         drone.execute_flight()
 
         drone.release_package()
+
+        drone.report("Starting return mission.")
 
         drone.upload_return_mission()
 
