@@ -28,7 +28,7 @@ class LandingVision:
         # Set up class attributes
         self.max_features = 100
         self.good_match_percent = 0.1
-        if socket.gethostname() == "raspberrypi":
+        if socket.gethostname() == "raspberrypi" and False:
             self.camera = PiCamera()
 
         # Find the features of the landing zone image
