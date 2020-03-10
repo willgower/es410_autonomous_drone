@@ -13,10 +13,6 @@ if socket.gethostname() == "raspberrypi":
     from picamera import PiCamera
 import time
 import os
-print(__file__)
-print(os.path.join(os.path.dirname(__file__), '/images/landing_image.png'))
-print(os.path.dirname(os.path.realpath(__file__)) + "/images/landing_image.png")
-print(os.path.abspath(os.path.dirname(__file__)))
 
 
 class LandingVision:
@@ -25,8 +21,8 @@ class LandingVision:
         Initialise camera and class attributes
         """
         # Landing image to search for
-        print("Looking for image at path: " + os.path.join(os.path.dirname(__file__), '/images/landing_image.png'))
-        self.target_image = cv2.imread(os.path.join(os.path.dirname(__file__), '/images/landing_image.png'), cv2.IMREAD_COLOR)
+        print("Looking for image at path: " + os.path.dirname(os.path.realpath(__file__)) + "/images/landing_image.png")
+        self.target_image = cv2.imread(os.path.dirname(os.path.realpath(__file__)) + "/images/landing_image.png", cv2.IMREAD_COLOR)
         self.target_image_grey = cv2.cvtColor(self.target_image, cv2.COLOR_BGR2GRAY)
 
         # Set up class attributes
